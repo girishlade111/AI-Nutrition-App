@@ -1,0 +1,73 @@
+import { AiPlan, IntakeData } from '@/app/lib/types';
+
+const MOCK_AI_PLAN: AiPlan = {
+  calorieTarget: 2150,
+  macros: {
+    protein: { target: 140, current: 0 },
+    carbs: { target: 250, current: 0 },
+    fats: { target: 65, current: 0 },
+  },
+  dailyPlan: [
+    { 
+      meal: 'Breakfast (सकाळचा नाश्ता)', 
+      time: '8:00 AM', 
+      items: [
+        { name: 'Poha (1 plate) with peanuts', calories: 280 },
+        { name: 'Glass of Buttermilk (Chaas)', calories: 40 },
+      ],
+      totalCalories: 320
+    },
+    { 
+      meal: 'Lunch (दुपारचे जेवण)', 
+      time: '1:00 PM', 
+      items: [
+        { name: 'Jowar Bhakri (2 medium)', calories: 140 },
+        { name: 'Methi Bhaji (1 bowl)', calories: 80 },
+        { name: 'Varan (Tur Dal) (1 small bowl)', calories: 100 },
+        { name: 'Side Salad (Cucumber, Tomato)', calories: 30 },
+      ],
+      totalCalories: 350
+    },
+    { 
+      meal: 'Snack (संध्याकाळचा नाश्ता)', 
+      time: '4:30 PM', 
+      items: [
+        { name: 'Handful of Mixed Nuts (Almonds, Walnuts)', calories: 150 },
+        { name: 'Small bowl of Dahi (Curd)', calories: 60 },
+      ],
+      totalCalories: 210
+    },
+    { 
+      meal: 'Dinner (रात्रीचे जेवण)', 
+      time: '8:00 PM', 
+      items: [
+        { name: 'Moong Dal Khichdi (1 plate)', calories: 350 },
+        { name: 'Mixed Vegetable Raita (1 bowl)', calories: 80 },
+      ],
+      totalCalories: 430
+    },
+  ],
+  whyThis: "Your plan focuses on complex carbs like Jowar ( ज्वारी) and Poha (पोहे) for sustained energy, perfect for your weight loss goal. We've included high-fiber vegetables like Methi (मेथी) and ample protein from Dal (डाळ) and Dahi (दही) to keep you full and support muscle. This is a balanced, traditional Maharashtrian approach to modern nutrition.",
+  moderationTip: {
+    food: 'Vada Pav',
+    tip: "We see you enjoy Vada Pav! You can absolutely include it. We recommend limiting it to once a week. To make it healthier, try having it with a side salad instead of fried chilies, and consider it as part of your lunch's carb quota, not as an extra snack."
+  }
+};
+
+// Mock API call with delay
+export const fetchAiPlan = (intakeData: IntakeData): Promise<AiPlan> => {
+  console.log("Sending intake data to mock AI:", intakeData);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // In a real app, the AI would customize this plan based on intakeData
+      const personalizedPlan = { ...MOCK_AI_PLAN };
+      if (intakeData.cheatFoods.toLowerCase().includes('misal')) {
+        personalizedPlan.moderationTip = {
+          food: 'Misal Pav',
+          tip: "Misal Pav is a great choice! To manage calories, ask for less 'farsan' on top and have it with just one pav. Pair it with buttermilk (Chaas) instead of a sugary drink."
+        }
+      }
+      resolve(personalizedPlan);
+    }, 3000); // 3-second delay
+  });
+};
