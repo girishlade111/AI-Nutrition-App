@@ -1,0 +1,102 @@
+'use client';
+
+import React from 'react';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
+import { Progress } from '@/app/components/ui/progress';
+import { IconArrowLeft, IconChevronRight } from '@/app/components/icons';
+import { PAGES } from '@/app/lib/constants';
+import { useIntake } from '@/app/context/IntakeContext';
+
+interface PageProps {
+  onNavigate: (page: string) => void;
+}
+
+export const IntakeStep1 = ({ onNavigate }: PageProps) => {
+  const { intakeData, updateIntake } = useIntake();
+  const isValid = intakeData.age && intakeData.height && intakeData.weight;
+  
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <Button variant="ghost" size="sm" onClick={() => onNavigate(PAGES.ONBOARDING)} className="mb-4">
+        <IconArrowLeft className="w-4 h-4 mr-2" /> Back
+      </Button>
+      <Progress value={33} className="mb-4" />
+      <h2 className="text-2xl font-semibold text-gray-900">Step 1: The Basics</h2>
+      <p className="text-gray-600 mb-6">Let's get to know you.</p>
+      
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="age">Age</Label>
+          <Input 
+            id="age" 
+            type="number" 
+            placeholder="e.g., 28" 
+            value={intakeData.age}
+            onChange={(e) => updateIntake('age', e.target.value)}
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label>Gender</Label>
+          <RadioGroup className="grid grid-cols-2 gap-4">
+            <RadioGroupItem 
+              id="male" 
+              name="gender" 
+              value="male"
+              checked={intakeData.gender === 'male'}
+              onChange={(e) => updateIntake('gender', e.target.value)}
+            >
+              Male
+            </RadioGroupItem>
+            <RadioGroupItem 
+              id="female" 
+              name="gender" 
+              value="female"
+              checked={intakeData.gender === 'female'}
+              onChange={(e) => updateIntake('gender', e.target.value)}
+            >
+              Female
+            </RadioGroupItem>
+          </RadioGroup>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="weight">Weight (kg)</Label>
+            <Input 
+              id="weight" 
+              type="number" 
+              placeholder="e.g., 75" 
+              value={intakeData.weight}
+              onChange={(e) => updateIntake('weight', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="height">Height (cm)</Label>
+            <Input 
+              id="height" 
+              type="number" 
+              placeholder="e.g., 170" 
+              value={intakeData.height}
+              onChange={(e) => updateIntake('height', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="w-full pt-8 sticky bottom-4">
+        <Button 
+          className="w-full text-lg font-semibold" 
+          size="lg"
+          disabled={!isValid}
+          onClick={() => onNavigate(PAGES.INTAKE_STEP_2)}
+        >
+          Next <IconChevronRight className="w-5 h-5 ml-2" />
+        </Button>
+      </div>
+    </div>
+  );
+};
