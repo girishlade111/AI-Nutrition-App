@@ -1,0 +1,33 @@
+// Simulates the different pages/routes
+export const PAGES = {
+  LANDING: 'landing',
+  ONBOARDING: 'onboarding',
+  INTAKE_STEP_1: 'intake-step-1',
+  INTAKE_STEP_2: 'intake-step-2',
+  INTAKE_STEP_3: 'intake-step-3',
+  GENERATING: 'generating',
+  DASHBOARD: 'dashboard',
+};
+
+export const DIET_TYPES = [
+  { value: 'veg', label: 'Vegetarian' },
+  { value: 'non-veg', label: 'Non-Vegetarian' },
+  { value: 'vegan', label: 'Vegan' },
+  { value: 'jain', label: 'Jain' },
+  { value: 'maharashtrian', label: 'Maharashtrian Specific' },
+];
+
+export const ACTIVITY_LEVELS = [
+  { value: 'sedentary', label: 'Sedentary (little to no exercise)' },
+  { value: 'light', label: 'Lightly Active (light exercise 1-3 days/week)' },
+  { value: 'moderate', label: 'Moderately Active (moderate exercise 3-5 days/week)' },
+  { value: 'very', label: 'Very Active (hard exercise 6-7 days/week)' },
+];
+
+export const GOALS = [
+  { value: 'loss', label: 'Weight Loss' },
+  { value: 'maintain', label: 'Weight Maintenance' },
+  { value: 'gain', label: 'Weight Gain' },
+];
+
+export const ALLERGIES_OPTIONS = ['Dairy', 'Gluten', 'Nuts', 'Soy', 'Shellfish', 'Peanuts'];
