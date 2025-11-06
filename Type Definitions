@@ -1,0 +1,45 @@
+export interface IntakeData {
+  age: string;
+  gender: 'male' | 'female';
+  height: string;
+  weight: string;
+  goal: 'loss' | 'maintain' | 'gain';
+  activity: 'sedentary' | 'light' | 'moderate' | 'very';
+  dietType: 'veg' | 'non-veg' | 'vegan' | 'jain' | 'maharashtrian';
+  allergies: string[];
+  cheatFoods: string;
+}
+
+export interface Macro {
+  target: number;
+  current: number;
+}
+
+export interface MealItem {
+  name: string;
+  calories: number;
+}
+
+export interface Meal {
+  meal: string;
+  time: string;
+  items: MealItem[];
+  totalCalories: number;
+}
+
+export interface ModerationTip {
+  food: string;
+  tip: string;
+}
+
+export interface AiPlan {
+  calorieTarget: number;
+  macros: {
+    protein: Macro;
+    carbs: Macro;
+    fats: Macro;
+  };
+  dailyPlan: Meal[];
+  whyThis: string;
+  moderationTip: ModerationTip;
+}
