@@ -1,0 +1,226 @@
+'use client';
+
+import React, { useState } from 'react';
+import { AiPlan } from '@/app/lib/types';
+import { cn } from '@/app/lib/utils';
+import { Button } from '@/app/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/app/components/ui/card';
+import { Badge } from '@/app/components/ui/badge';
+import { Progress } from '@/app/components/ui/progress';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/app/components/ui/accordion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/tabs';
+import { IconFlame, IconHeart, IconMessageCircle, IconSparkles, IconChevronDown } from '@/app/components/icons';
+import { AiMealHelper } from '@/app/components/ai-helper';
+
+interface DashboardPageProps {
+  plan: AiPlan;
+  onReset: () => void;
+}
+
+export const DashboardPage = ({ plan, onReset }: DashboardPageProps) => {
+  const [activeTab, setActiveTab] = useState('plan');
+  const { protein, carbs, fats } = plan.macros;
+  
+  // Calculate total calories for progress
+  const totalCalories = plan.dailyPlan.reduce((acc, meal) => acc + meal.totalCalories, 0);
+  
+  const macroData = [
+    { name: 'Protein (g)', target: protein.target, value: (protein.target * 0.7), color: 'bg-blue-500', percent: 70 },
+    { name: 'Carbs (g)', target: carbs.target, value: (carbs.target * 0.6), color: 'bg-green-500', percent: 60 },
+    { name: 'Fats (g)', target: fats.target, value: (fats.target * 0.8), color: 'bg-yellow-500', percent: 80 },
+  ];
+  
+  const [isWhyOpen, setIsWhyOpen] = useState(false);
+  const [activeAiMeal, setActiveAiMeal] = useState<string | null>(null); // Tracks which meal's AI box is open
+
+  const handleAiClick = (mealName: string) => {
+    if (activeAiMeal === mealName) {
+      setActiveAiMeal(null); // Close if already open
+    } else {
+      setActiveAiMeal(mealName); // Open new one
+    }
+  };
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen pb-24">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold text-gray-900">Your Plan</h1>
+        <Button variant="ghost" size="sm" onClick={onReset}>
+          Reset
+        </Button>
+      </div>
+      
+      <Tabs className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger isActive={activeTab === 'plan'} onClick={() => setActiveTab('plan')}>
+            Daily Plan
+          </TabsTrigger>
+          <TabsTrigger isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')}>
+            Social Feed (Mock)
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* --- PLAN TAB --- */}
+        <TabsContent isActive={activeTab === 'plan'} className="space-y-6 mt-6">
+          {/* Summary Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Daily Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <span className="text-sm text-gray-600">Calorie Target</span>
+                <p className="text-4xl font-bold text-orange-600 flex items-center justify-center">
+                  <IconFlame className="w-8 h-8 mr-2" />
+                  {plan.calorieTarget}
+                  <span className="text-lg text-gray-500 ml-1">kcal</span>
+                </p>
+              </div>
+              <div className="space-y-3 pt-2">
+                {macroData.map(macro => (
+                  <div key={macro.name}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-medium">{macro.name}</span>
+                      <span className="text-gray-600">{macro.value.toFixed(0)} / {macro.target}g</span>
+                    </div>
+                    <Progress value={macro.percent} indicatorColor={macro.color} />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Moderation Tip */}
+          <Card className="bg-orange-50 border-orange-200">
+            <CardHeader>
+              <CardTitle className="flex items-center text-orange-800">
+                <span className="text-2xl mr-3">💡</span>
+                Food Moderation Tip
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700">
+                <span className="font-semibold">{plan.moderationTip.food}:</span> {plan.moderationTip.tip}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Daily Plan */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">Your Meals</h3>
+            {plan.dailyPlan.map(meal => (
+              <Card key={meal.meal}>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>{meal.meal}</CardTitle>
+                      <CardDescription>{meal.time}</CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="text-sm font-semibold">
+                      {meal.totalCalories} kcal
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    {meal.items.map(item => (
+                      <li key={item.name}>{item.name} ({item.calories} kcal)</li>
+                    ))}
+                  </ul>
+                </CardContent>
+                
+                <CardFooter className="flex-col items-start space-y-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                    onClick={() => handleAiClick(meal.meal)}
+                  >
+                    <IconSparkles className="w-4 h-4 mr-2" />
+                    ✨ AI Meal Helper
+                    <IconChevronDown className={cn("w-4 h-4 ml-2 transition-transform", activeAiMeal === meal.meal && "rotate-180")} />
+                  </Button>
+
+                  <AiMealHelper meal={meal} isOpen={activeAiMeal === meal.meal} />
+
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Why this? */}
+          <Accordion>
+            <AccordionItem>
+              <AccordionTrigger isOpen={isWhyOpen} onClick={() => setIsWhyOpen(!isWhyOpen)}>
+                <span className="font-medium">Why this plan for me?</span>
+              </AccordionTrigger>
+              <AccordionContent isOpen={isWhyOpen}>
+                <p className="text-gray-600">{plan.whyThis}</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+          
+        </TabsContent>
+        
+        {/* --- SOCIAL FEED TAB --- */}
+        <TabsContent isActive={activeTab === 'feed'} className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <img src="https://placehold.co/40x40/FFE8CC/F97316?text=RP&font=inter" className="rounded-full" alt="User avatar" />
+                <div>
+                  <CardTitle className="text-base">riya_pune</CardTitle>
+                  <CardDescription className="text-xs">Pune, Maharashtra</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <img 
+                src="https://placehold.co/600x600/FFF0E6/F97316?text=My+Healthy+Lunch!&font=inter" 
+                alt="Mock food post" 
+                className="w-full h-auto"
+                onError={(e) => (e.currentTarget.src = 'https://placehold.co/600x600/FFF0E6/F97316?text=Food+Post&font=inter')}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between items-center p-4">
+              <div className="flex space-x-4 text-gray-600">
+                <IconHeart className="w-6 h-6 hover:text-red-500 cursor-pointer" />
+                <IconMessageCircle className="w-6 h-6 hover:text-blue-500 cursor-pointer" />
+              </div>
+              <span className="text-sm text-gray-500">102 likes</span>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <img src="https://placehold.co/40x40/CCEBDD/10B981?text=AK&font=inter" className="rounded-full" alt="User avatar" />
+                <div>
+                  <CardTitle className="text-base">akshay_k</CardTitle>
+                  <CardDescription className="text-xs">Mumbai, Maharashtra</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <img 
+                src="https://placehold.co/600x600/E6F9F5/10B981?text=Post-Workout+Meal&font=inter" 
+                alt="Mock food post 2" 
+                className="w-full h-auto"
+                onError={(e) => (e.currentTarget.src = 'https://placehold.co/600x600/E6F9F5/10B981?text=Food+Post&font=inter')}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between items-center p-4">
+              <div className="flex space-x-4 text-gray-600">
+                <IconHeart className="w-6 h-6 hover:text-red-500 cursor-pointer" />
+                <IconMessageCircle className="w-6 h-6 hover:text-blue-500 cursor-pointer" />
+              </div>
+              <span className="text-sm text-gray-500">77 likes</span>
+            </CartFooter>
+          </Card>
+
+        </TabsContent>
+      </Tabs>
+      
+    </div>
+  );
+};
