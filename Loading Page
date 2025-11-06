@@ -1,0 +1,44 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { IconLoader } from '@/app/components/icons';
+import { Skeleton } from '@/app/components/ui/skeleton';
+
+export const GeneratingPlanPage = () => {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const messages = [
+    "Analyzing your TDEE...",
+    "Looking up local Maharashtrian recipes...",
+    "Balancing macros (Protein, Carbs, Fat)...",
+    "Finding space for your favorite foods...",
+    "Finalizing your personal plan..."
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex(prev => (prev + 1) % messages.length);
+    }, 1500); // Change message every 1.5s
+    return () => clearInterval(interval);
+  }, [messages.length]); // Add dependency
+
+  return (
+    <div className="p-6 bg-white min-h-screen flex flex-col">
+      <h2 className="text-2xl font-semibold text-gray-900 text-center mt-16">Generating Your Plan</h2>
+      <p className="text-gray-600 mb-8 text-center">This will just take a moment.</p>
+
+      <div className="flex-grow flex flex-col items-center justify-center space-y-6">
+        <IconLoader className="w-16 h-16 text-orange-600" />
+        <p className="text-lg text-orange-700 font-medium h-6">
+          {messages[messageIndex]}
+        </p>
+      </div>
+      
+      <div className="space-y-4 w-full max-w-md mx-auto mb-16">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    </div>
+  );
+};
