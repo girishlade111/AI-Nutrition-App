@@ -1,0 +1,44 @@
+/**
+ * Fetches data from the Gemini API with exponential backoff.
+ * @param {string} apiUrl The API URL to fetch.
+ *@param {object} payload The payload for the POST request.
+ * @param {number} maxRetries Maximum number of retries.
+ * @returns {Promise<object>} The JSON response from the API.
+ */
+export const fetchWithRetry = async (apiUrl: string, payload: object, maxRetries = 3): Promise<any> => {
+  let attempt = 0;
+  let delay = 1000; // 1 second
+
+  while (attempt < maxRetries) {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
+
+      // Handle non-OK responses (e.g., 5xx errors)
+      if (response.status >= 500) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      // Handle client errors (e.g., 4xx) without retrying
+      return await response.json();
+
+    } catch (error: any) {
+      console.warn(`Attempt ${attempt + 1} failed. Retrying in ${delay}ms...`, error);
+      if (attempt === maxRetries - 1) {
+        throw new Error(`Failed to fetch from Gemini API after ${maxRetries} attempts: ${error.message}`);
+      }
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2; // Exponential backoff
+      attempt++;
+    }
+  }
+  // This line should not be reachable, but satisfies TypeScript
+  throw new Error("API fetch failed unexpectedly.");
+};
