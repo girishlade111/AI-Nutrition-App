@@ -1,0 +1,144 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Meal } from '@/app/lib/types';
+import { fetchWithRetry } from '@/app/services/gemini';
+import { Button } from '@/app/components/ui/button';
+import { CardTitle } from '@/app/components/ui/card';
+import { IconLoader } from '@/app/components/icons';
+
+interface AiMealHelperProps {
+  meal: Meal;
+  isOpen: boolean;
+}
+
+type PromptType = 'recipe' | 'low_carb' | 'high_protein';
+
+export const AiMealHelper = ({ meal, isOpen }: AiMealHelperProps) => {
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+
+  /**
+   * Calls the Gemini API
+   */
+  const generateAiResponse = async (promptType: PromptType, meal: Meal) => {
+    setIsAiLoading(true);
+    setAiError(null);
+    setAiResponse(null);
+
+    const apiKey = ""; // API key will be injected
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    const systemPrompt = `You are 'Swaad AI', an expert Maharashtrian nutritionist and chef. You are friendly, encouraging, and provide concise, healthy advice. ALWAYS respond in simple language, using Maharashtrian food names (e.g., 'Bhakri', 'Koshimbir') where appropriate. Format your response with simple markdown (bolding, lists). Do not use emoji.`;
+
+    const mealItems = meal.items.map(i => i.name).join(', ');
+    let userQuery = '';
+
+    switch (promptType) {
+      case 'recipe':
+        userQuery = `My plan includes ${mealItems} for ${meal.meal}. Can you give me a simple, healthy recipe for ${meal.items[0].name}?`;
+        break;
+      case 'low_carb':
+        userQuery = `My plan for ${meal.meal} is ${mealItems} (around ${meal.totalCalories} kcal). Can you suggest a good low-carb alternative for this meal that is still Maharashtrian and has similar calories?`;
+        break;
+      case 'high_protein':
+        userQuery = `My plan for ${meal.meal} is ${mealItems} (around ${meal.totalCalories} kcal). Can you suggest a high-protein alternative for this meal that is still Maharashtrian and has similar calories?`;
+        break;
+      default:
+        setIsAiLoading(false);
+        setAiError("Invalid prompt type.");
+        return;
+    }
+
+    const payload = {
+      contents: [{ parts: [{ text: userQuery }] }],
+      systemInstruction: {
+        parts: [{ text: systemPrompt }]
+      },
+    };
+
+    try {
+      const result = await fetchWithRetry(apiUrl, payload);
+
+      if (result.candidates && result.candidates.length > 0) {
+        const text = result.candidates[0].content.parts[0].text;
+        setAiResponse(text);
+      } else {
+        throw new Error("Invalid response structure from AI.");
+      }
+
+    } catch (error: any) {
+      console.error("Gemini API call failed:", error);
+      setAiError("Sorry, the AI is busy right now. Please try again in a moment.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="w-full p-4 bg-orange-50/50 rounded-lg border border-orange-100">
+      <CardTitle className="text-base mb-3">Ask Swaad AI:</CardTitle>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white"
+          onClick={() => generateAiResponse('recipe', meal)}
+          disabled={isAiLoading}
+        >
+          Get healthy recipe
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white"
+          onClick={() => generateAiResponse('low_carb', meal)}
+          disabled={isAiLoading}
+        >
+          Make it low-carb
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white"
+          onClick={() => generateAiResponse('high_protein', meal)}
+          disabled={isAiLoading}
+        >
+          Make it high-protein
+        </Button>
+      </div>
+
+      {/* AI Response Area */}
+      <div className="mt-4 min-h-[6rem]">
+        {isAiLoading && (
+          <div className="flex items-center justify-center space-x-2 text-gray-600">
+            <IconLoader className="w-5 h-5" />
+            <span>Swaad AI is thinking...</span>
+          </div>
+        )}
+        {aiError && (
+          <div className="p-3 rounded-md bg-red-100 border border-red-200 text-red-800 text-sm">
+            {aiError}
+          </div>
+        )}
+        {aiResponse && (
+          <div
+            className="p-3 rounded-md bg-white border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap"
+            // Simple markdown renderer (bold and lists)
+            dangerouslySetInnerHTML={{
+              __html: aiResponse
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/^- (.*$)/gm, '<ul class="list-disc list-inside ml-4"><li>$1</li></ul>') // Lists
+                .replace(/<\/ul>\n<ul/g, '') // Fix consecutive lists
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
