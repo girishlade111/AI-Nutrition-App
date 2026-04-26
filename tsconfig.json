@@ -1,4 +1,4 @@
-e{
+{
     "compilerOptions": {
         "lib": [
             "dom",
