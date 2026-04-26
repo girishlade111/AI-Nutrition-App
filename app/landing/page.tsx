@@ -1,4 +1,6 @@
-import { Link } from '@/components/ui/button';
+'use client';
+
+import Link from 'next/link';
 
 export default function LandingPage() {
   return (
@@ -10,20 +12,23 @@ export default function LandingPage() {
         <p className="text-lg leading-6 text-gray-600">
           AI Nutrition, Made for Maharashtra.
         </p>
-        <div className="mt-10 space-x-4 space-x-6 lg:space-x-0 lg:flex">
+        <div className="mt-10 space-x-4 space-y-4 lg:space-y-0 lg:flex lg:space-x-6">
           <Link
             href="/onboarding"
-            className="w-full rounded-md bg-indigo-600 px-5 py-3 text-base font-medium text-white sm:w-auto lg:w-auto"
+            className="w-full rounded-md bg-indigo-600 px-5 py-3 text-base font-medium text-white sm:w-auto lg:w-auto inline-block"
           >
             Get Started
           </Link>
           <Link
             href="/dashboard"
-            className="w-full rounded-md border border-gray-300 px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 sm:w-auto lg:w-auto"
+            className="w-full rounded-md bg-gray-100 px-5 py-3 text-base font-medium text-gray-700 sm:w-auto lg:w-auto inline-block"
           >
             View Demo
           </Link>
         </div>
+        <p className="mt-4 text-sm text-gray-500">
+          Track your nutrition with AI-powered personalized meal plans
+        </p>
       </div>
     </div>
   );
