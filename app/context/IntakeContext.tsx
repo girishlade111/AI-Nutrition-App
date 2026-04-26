@@ -178,3 +178,148 @@ export const useIntake = () => {
   }
   return context;
 };
+
+// Custom hook for daily progress functionality
+export const useDailyProgress = () => {
+  const { state, dispatch } = useIntake();
+  
+  const logMeal = (mealName: string, nutrition: { calories: number; protein: number; carbs: number; fats: number }) => {
+    // Create a daily log entry for today
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if we already have a log for today
+    const existingLogIndex = state.dailyLogs.findIndex(log => log.date === today);
+    
+    if (existingLogIndex >= 0) {
+      // Update existing log
+      const updatedLog = { ...state.dailyLogs[existingLogIndex] };
+      
+      // Find if meal already exists in this log
+      const mealIndex = updatedLog.meals.findIndex(m => m.meal === mealName);
+      
+      if (mealIndex >= 0) {
+        // Update existing meal
+        const updatedMeal = { ...updatedLog.meals[mealIndex] };
+        // Add nutrition to existing meal
+        updatedMeal.items.push({
+          name: mealName,
+          calories: nutrition.calories,
+          protein: nutrition.protein,
+          carbs: nutrition.carbs,
+          fats: nutrition.fats
+        });
+        
+        // Recalculate meal totals
+        updatedMeal.totalCalories = updatedMeal.items.reduce((sum, item) => sum + (item.calories || 0), 0);
+        updatedMeal.totalProtein = updatedMeal.items.reduce((sum, item) => sum + (item.protein || 0), 0);
+        updatedMeal.totalCarbs = updatedMeal.items.reduce((sum, item) => sum + (item.carbs || 0), 0);
+        updatedMeal.totalFats = updatedMeal.items.reduce((sum, item) => sum + (item.fats || 0), 0);
+        
+        // Update the meal in the log
+        updatedLog.meals[mealIndex] = updatedMeal;
+      } else {
+        // Add new meal
+        updatedLog.meals.push({
+          meal: mealName,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          items: [{
+            name: mealName,
+            calories: nutrition.calories,
+            protein: nutrition.protein,
+            carbs: nutrition.carbs,
+            fats: nutrition.fats
+          }],
+          totalCalories: nutrition.calories,
+          totalProtein: nutrition.protein,
+          totalCarbs: nutrition.carbs,
+          totalFats: nutrition.fats
+        });
+      }
+      
+      // Update water intake and notes if needed (keeping existing)
+      const updatedLogs = [...state.dailyLogs];
+      updatedLogs[existingLogIndex] = updatedLog;
+      dispatch({ type: 'SET_DAILY_LOGS', payload: updatedLogs });
+    } else {
+      // Create new log for today
+      const newLog: DailyLog = {
+        date: today,
+        meals: [{
+          meal: mealName,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          items: [{
+            name: mealName,
+            calories: nutrition.calories,
+            protein: nutrition.protein,
+            carbs: nutrition.carbs,
+            fats: nutrition.fats
+          }],
+          totalCalories: nutrition.calories,
+          totalProtein: nutrition.protein,
+          totalCarbs: nutrition.carbs,
+          totalFats: nutrition.fats
+        }],
+        waterIntake: 0,
+        notes: ''
+      };
+      
+      dispatch({ type: 'ADD_DAILY_LOG', payload: newLog });
+    }
+    
+    // Update daily progress
+    updateDailyProgress();
+  };
+  
+  const updateDailyProgress = () => {
+    if (!state.aiPlan) return;
+    
+    // Group logs by date
+    const progressByDate: Record<string, DailyProgress> = {};
+    
+    state.dailyLogs.forEach(log => {
+      const date = log.date;
+      if (!progressByDate[date]) {
+        progressByDate[date] = {
+          date,
+          caloriesConsumed: 0,
+          proteinConsumed: 0,
+          carbsConsumed: 0,
+          fatsConsumed: 0,
+          caloriesTarget: state.aiPlan.calorieTarget,
+          proteinTarget: state.aiPlan.macros.protein.target,
+          carbsTarget: state.aiPlan.macros.carbs.target,
+          fatsTarget: state.aiPlan.macros.fats.target
+        };
+      }
+      
+      // Sum up nutrition from all meals in this log
+      log.meals.forEach(meal => {
+        progressByDate[date].caloriesConsumed += meal.totalCalories;
+        progressByDate[date].proteinConsumed += meal.totalProtein || 0;
+        progressByDate[date].carbsConsumed += meal.totalCarbs || 0;
+        progressByDate[date].fatsConsumed += meal.totalFats || 0;
+      });
+    });
+    
+    // Convert to array and sort by date (newest first)
+    const progressArray = Object.values(progressByDate)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    dispatch({ type: 'SET_DAILY_PROGRESS', payload: progressArray });
+  };
+  
+  const setDailyProgress = (progress: DailyProgress[]) => {
+    dispatch({ type: 'SET_DAILY_PROGRESS', payload: progress });
+  };
+  
+  // Initialize daily progress from existing logs
+  useEffect(() => {
+    updateDailyProgress();
+  }, [state.dailyLogs, state.aiPlan]);
+  
+  return {
+    dailyProgress: state.dailyProgress,
+    setDailyProgress,
+    logMeal
+  };
+};
