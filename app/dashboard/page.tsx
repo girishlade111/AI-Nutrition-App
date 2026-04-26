@@ -1,10 +1,12 @@
 import { useIntake } from '@/app/context/IntakeContext';
 import { useDailyProgress } from '@/app/context/IntakeContext';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const { intakeData, aiPlan } = useIntake();
   const { dailyProgress, setDailyProgress, logMeal } = useDailyProgress();
+  const router = useRouter();
 
   if (!intakeData) {
     return <div>Loading...</div>;
@@ -171,17 +173,13 @@ export default function DashboardPage() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row sm:space-x-4">
             <button
-              onClick={() => {
-                // Navigate to tracker
-              }}
+              onClick={() => router.push('/tracker')}
               className="w-full sm:w-auto flex-1 px-4 py-3 bg-indigo-600 text-sm font-medium text-white rounded-lg hover:bg-indigo-700"
             >
               Track Meals
             </button>
             <button
-              onClick={() => {
-                // Navigate to history
-              }}
+              onClick={() => router.push('/history')}
               className="w-full sm:w-auto flex-1 px-4 py-3 border border-gray-300 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50"
             >
               View History
