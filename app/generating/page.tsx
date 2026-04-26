@@ -15,6 +15,8 @@ export default function GeneratingPage() {
     let isCancelled = false;
 
     async function generatePlan() {
+      if (!intakeData) return;
+      
       try {
         const aiPlan = await generateAiPlan(intakeData);
         if (!isCancelled) {

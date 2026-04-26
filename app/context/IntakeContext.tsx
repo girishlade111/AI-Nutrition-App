@@ -1,13 +1,8 @@
 'use client';
 
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { 
-  IntakeData, 
-  AiPlan, 
-  DailyLog, 
-  DailyProgress,
-  LOCAL_STORAGE_KEYS
-} from '@/app/lib/types';
+import { IntakeData, AiPlan, DailyLog, DailyProgress } from '@/app/lib/types';
+import { LOCAL_STORAGE_KEYS } from '@/app/lib/constants';
 
 interface IntakeState {
   intakeData: IntakeData | null;
@@ -296,10 +291,10 @@ export const useDailyProgress = () => {
           proteinConsumed: 0,
           carbsConsumed: 0,
           fatsConsumed: 0,
-          caloriesTarget: state.aiPlan.calorieTarget,
-          proteinTarget: state.aiPlan.macros.protein.target,
-          carbsTarget: state.aiPlan.macros.carbs.target,
-          fatsTarget: state.aiPlan.macros.fats.target
+          caloriesTarget: state.aiPlan!.calorieTarget,
+          proteinTarget: state.aiPlan!.macros.protein.target,
+          carbsTarget: state.aiPlan!.macros.carbs.target,
+          fatsTarget: state.aiPlan!.macros.fats.target
         };
       }
       

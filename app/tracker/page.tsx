@@ -165,7 +165,7 @@ export default function TrackerPage() {
             <div className="mb-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 Add "{selectedFood.food_name}" to your log
-              </div>
+              </h2>
               <div className="bg-white rounded-lg shadow sm:rounded-md p-6">
                 <div className="mb-4">
                   <p className="text-sm text-gray-500">

@@ -1,10 +1,13 @@
+'use client';
+
 import { useIntake } from '@/app/context/IntakeContext';
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { format } from 'date-fns';
+import { Meal, MealItem } from '@/app/lib/types';
 
 export default function HistoryPage() {
-  const { dailyLogs } = useIntake();
+  const { state } = useIntake();
+  const dailyLogs = state.dailyLogs;
   
-  // Group logs by date for display
   const logsByDate = [...dailyLogs].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -77,7 +80,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
                   <div className="divide-y">
-                    {log.meals.map((meal, index) => (
+                    {log.meals.map((meal: Meal, index: number) => (
                       <div key={`${log.date}-${index}`} className="px-4 py-3">
                         <div className="flex justify-between items-start">
                           <div>
@@ -89,7 +92,7 @@ export default function HistoryPage() {
                           </span>
                         </div>
                         <div className="mt-2 space-y-1 text-sm">
-                          {meal.items.map((item, itemIndex) => (
+                          {meal.items.map((item: MealItem, itemIndex: number) => (
                             <div key={itemIndex} className="flex justify-between">
                               <span className="text-gray-600">{item.name}</span>
                               <span>{item.calories} kcal</span>
