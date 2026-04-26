@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '@/app/context/IntakeContext';
-import { generateAiPlan } from '@/app/services/gemini';
+import { generateAiPlan } from '@/app/services/aiPlan';
 
 export default function GeneratingPage() {
   const { intakeData, setAiPlan } = useIntake();
