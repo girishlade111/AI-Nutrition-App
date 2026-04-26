@@ -6,16 +6,100 @@ import { useIntake } from '@/app/context/IntakeContext';
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    age: '',
+    gender: 'male' as const,
+    height: '',
+    weight: '',
+    goal: 'loss' as const,
+    activity: 'sedentary' as const,
+    dietType: 'veg' as const,
+    allergies: [] as string[],
+    cheatFoods: '',
+    medicalConditions: ''
+  });
+  const [error, setError] = useState<string | null>(null);
   const { setIntakeData } = useIntake();
   const router = useRouter();
 
-  const handleComplete = (data: any) => {
-    setIntakeData(data);
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      // Navigate to generating page
-      router.push('/generating');
+  const validateStep = (stepNumber: number): boolean => {
+    setError(null);
+    switch (stepNumber) {
+      case 1:
+        if (!formData.age || !formData.height || !formData.weight) {
+          setError('Please fill in all basic profile fields');
+          return false;
+        }
+        const ageNum = parseInt(formData.age);
+        const heightNum = parseInt(formData.height);
+        const weightNum = parseInt(formData.weight);
+        if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
+          setError('Please enter a valid age between 13 and 120');
+          return false;
+        }
+        if (isNaN(heightNum) || heightNum < 100 || heightNum > 250) {
+          setError('Please enter a valid height between 100 and 250 cm');
+          return false;
+        }
+        if (isNaN(weightNum) || weightNum < 30 || weightNum > 300) {
+          setError('Please enter a valid weight between 30 and 300 kg');
+          return false;
+        }
+        return true;
+      case 2:
+        if (!formData.goal || !formData.activity) {
+          setError('Please select goal and activity level');
+          return false;
+        }
+        return true;
+      case 3:
+        if (!formData.dietType || formData.cheatFoods === undefined) {
+          setError('Please select diet type and enter cheat foods');
+          return false;
+        }
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const handleFieldChange = (field: keyof typeof formData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleAllergyChange = (allergy: string, checked: boolean) => {
+    setFormData(prev => {
+      const allergies = [...prev.allergies];
+      if (checked) {
+        if (!allergies.includes(allergy)) allergies.push(allergy);
+      } else {
+        const index = allergies.indexOf(allergy);
+        if (index > -1) allergies.splice(index, 1);
+      }
+      return { ...prev, allergies };
+    });
+  };
+
+  const handleNext = () => {
+    if (validateStep(step)) {
+      if (step < 3) {
+        setStep(step + 1);
+      } else {
+        // Final step: validate and submit
+        if (validateStep(3)) {
+          setIntakeData(formData);
+          router.push('/generating');
+        }
+      }
+    }
+  };
+
+  const handlePrevious = () => {
+    if (step > 1) {
+      setStep(step - 1);
     }
   };
 
@@ -28,6 +112,11 @@ export default function OnboardingPage() {
               <h2 className="text-2xl font-bold text-gray-900">
                 Let's personalize your nutrition plan
               </h2>
+              {error && (
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 text-red-600 rounded">
+                  {error}
+                </div>
+              )}
               <p className="mt-2 text-sm text-gray-600">
                 Step {step} of 3
               </p>
@@ -45,6 +134,8 @@ export default function OnboardingPage() {
                       type="number"
                       min="13"
                       max="120"
+                      value={formData.age}
+                      onChange={(e) => handleFieldChange('age', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -53,6 +144,8 @@ export default function OnboardingPage() {
                       Gender
                     </label>
                     <select
+                      value={formData.gender}
+                      onChange={(e) => handleFieldChange('gender', e.target.value as const)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                       <option value="male">Male</option>
@@ -70,6 +163,8 @@ export default function OnboardingPage() {
                       type="number"
                       min="100"
                       max="250"
+                      value={formData.height}
+                      onChange={(e) => handleFieldChange('height', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -81,6 +176,8 @@ export default function OnboardingPage() {
                       type="number"
                       min="30"
                       max="300"
+                      value={formData.weight}
+                      onChange={(e) => handleFieldChange('weight', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -96,6 +193,8 @@ export default function OnboardingPage() {
                     Main Goal
                   </label>
                   <select
+                    value={formData.goal}
+                    onChange={(e) => handleFieldChange('goal', e.target.value as const)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="loss">Weight Loss</option>
@@ -109,6 +208,8 @@ export default function OnboardingPage() {
                     Activity Level
                   </label>
                   <select
+                    value={formData.activity}
+                    onChange={(e) => handleFieldChange('activity', e.target.value as const)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="sedentary">Sedentary (little to no exercise)</option>
@@ -129,6 +230,8 @@ export default function OnboardingPage() {
                     Diet Type
                   </label>
                   <select
+                    value={formData.dietType}
+                    onChange={(e) => handleFieldChange('dietType', e.target.value as const)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="veg">Vegetarian</option>
@@ -150,7 +253,8 @@ export default function OnboardingPage() {
                           <div className="flex-shrink-0 h-5 w-5">
                             <input
                               type="checkbox"
-                              value={allergy}
+                              checked={formData.allergies.includes(allergy)}
+                              onChange={(e) => handleAllergyChange(allergy, e.target.checked)}
                               className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                             />
                           </div>
@@ -170,6 +274,8 @@ export default function OnboardingPage() {
                   <input
                     type="text"
                     placeholder="e.g., misal pav, vada pav, biryani"
+                    value={formData.cheatFoods}
+                    onChange={(e) => handleFieldChange('cheatFoods', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -181,6 +287,8 @@ export default function OnboardingPage() {
                   <textarea
                     rows="3"
                     placeholder="e.g., diabetes, hypertension, thyroid"
+                    value={formData.medicalConditions}
+                    onChange={(e) => handleFieldChange('medicalConditions', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -191,30 +299,15 @@ export default function OnboardingPage() {
           <div className="mt-10 flex justify-end space-x-3">
             {step > 1 && (
               <button
-                onClick={() => setStep(step - 1)}
+                onClick={handlePrevious}
                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Previous
               </button>
             )}
             <button
-              onClick={() => {
-                // In a real app, we would collect form data here
-                // For now, we'll simulate with dummy data
-                const dummyData = {
-                  age: "25",
-                  gender: "male" as const,
-                  height: "170",
-                  weight: "70",
-                  goal: "loss" as const,
-                  activity: "moderate" as const,
-                  dietType: "veg" as const,
-                  allergies: [],
-                  cheatFoods: "misal pav",
-                  medicalConditions: ""
-                };
-                handleComplete(dummyData);
-              }}
+              onClick={handleNext}
+              disabled={step === 1 && !validateStep(1) || step === 2 && !validateStep(2) || step === 3 && !validateStep(3)}
               className="px-5 py-2 rounded-md bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700"
             >
               {step === 3 ? 'Get My Plan' : 'Next'}
