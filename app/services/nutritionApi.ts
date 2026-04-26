@@ -19,21 +19,28 @@ interface NutritionixResponse {
     foods: NutritionixFood[];
 }
 
-export async function searchFoodNutrition(query: string): Promise<{
-    name: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fats: number;
-    serving: string;
-} | null> {
+export interface FoodSearchResult {
+    foods: Array<{
+        food_name: string;
+        serving_qty: number;
+        serving_unit: string;
+        serving_weight_grams: number;
+        nf_calories: number;
+        nf_protein: number;
+        nf_total_carbohydrate: number;
+        nf_total_fat: number;
+    }>;
+}
+
+export async function searchFoodNutrition(query: string): Promise<FoodSearchResult> {
     const result = foodQuerySchema.safeParse(query);
     if (!result.success) {
         throw new Error("Invalid food query: " + result.error.errors[0].message);
     }
 
     if (!NUTRITIONIX_APP_ID || !NUTRITIONIX_API_KEY) {
-        return estimateNutrition(query);
+        const estimated = estimateNutrition(query);
+        return { foods: estimated ? [estimated] : [] };
     }
 
     try {
@@ -53,21 +60,15 @@ export async function searchFoodNutrition(query: string): Promise<{
         );
 
         if (!data.foods || data.foods.length === 0) {
-            return null;
+            const estimated = estimateNutrition(query);
+            return { foods: estimated ? [estimated] : [] };
         }
 
-        const food = data.foods[0];
-        return {
-            name: food.food_name,
-            calories: Math.round(food.nf_calories),
-            protein: Math.round(food.nf_protein * 10) / 10,
-            carbs: Math.round(food.nf_total_carbohydrate * 10) / 10,
-            fats: Math.round(food.nf_total_fat * 10) / 10,
-            serving: `${food.serving_qty} ${food.serving_unit} (${food.serving_weight_grams}g)`,
-        };
+        return data;
     } catch (error) {
         console.warn("Nutritionix API failed, using estimation:", error);
-        return estimateNutrition(query);
+        const estimated = estimateNutrition(query);
+        return { foods: estimated ? [estimated] : [] };
     }
 }
 
@@ -463,27 +464,40 @@ const knownFoods: Record<string, { calories: number; protein: number; carbs: num
 };
 
 function estimateNutrition(query: string): {
-    name: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fats: number;
-    serving: string;
+    food_name: string;
+    serving_qty: number;
+    serving_unit: string;
+    serving_weight_grams: number;
+    nf_calories: number;
+    nf_protein: number;
+    nf_total_carbohydrate: number;
+    nf_total_fat: number;
 } | null {
     const lowerQuery = query.toLowerCase();
 
     for (const [key, value] of Object.entries(knownFoods)) {
         if (lowerQuery.includes(key)) {
-            return { name: query.trim(), ...value };
+            return {
+                food_name: query.trim(),
+                serving_qty: 1,
+                serving_unit: value.serving.split(' ')[1] || 'serving',
+                serving_weight_grams: 100,
+                nf_calories: value.calories,
+                nf_protein: value.protein,
+                nf_total_carbohydrate: value.carbs,
+                nf_total_fat: value.fats,
+            };
         }
     }
 
     return {
-        name: query.trim(),
-        calories: 150,
-        protein: 5,
-        carbs: 20,
-        fats: 5,
-        serving: "1 serving (estimated)",
+        food_name: query.trim(),
+        serving_qty: 1,
+        serving_unit: "serving",
+        serving_weight_grams: 100,
+        nf_calories: 150,
+        nf_protein: 5,
+        nf_total_carbohydrate: 20,
+        nf_total_fat: 5,
     };
 }

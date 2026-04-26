@@ -1,23 +1,32 @@
+'use client';
+
 import { useIntake } from '@/app/context/IntakeContext';
 import { useDailyProgress } from '@/app/context/IntakeContext';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import { calculatePercentage } from '@/app/lib/utils';
 
 export default function DashboardPage() {
-  const { intakeData, aiPlan } = useIntake();
-  const { dailyProgress, setDailyProgress, logMeal } = useDailyProgress();
+  const { state } = useIntake();
+  const { dailyProgress } = useDailyProgress();
   const router = useRouter();
 
+  const intakeData = state.intakeData;
+  const aiPlan = state.aiPlan;
+
   if (!intakeData) {
-    return <div>Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (!aiPlan) {
-    return <div>Generating plan...</div>;
+    return <div className="min-h-screen flex items-center justify-center">Generating plan...</div>;
   }
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const todayProgress = dailyProgress.find(p => p.date === today);
+  const calorieProgress = todayProgress 
+    ? calculatePercentage(todayProgress.caloriesConsumed, aiPlan.calorieTarget)
+    : 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -54,11 +63,8 @@ export default function DashboardPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div
-                        className={`bg-indigo-600 h-2.5 rounded-full ${
-                          todayProgress.caloriesConsumed >= aiPlan.calorieTarget
-                            ? 'w-full'
-                            : `w-[${(todayProgress.caloriesConsumed / aiPlan.calorieTarget) * 100}%]`
-                        }`}
+                        className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(calorieProgress, 100)}%` }}
                       ></div>
                     </div>
                     <p className="mt-1 text-sm text-gray-500">

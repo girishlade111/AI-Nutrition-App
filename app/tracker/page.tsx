@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useIntake } from '@/app/context/IntakeContext';
+import { useIntake, useDailyProgress } from '@/app/context/IntakeContext';
 import { searchFoodNutrition } from '@/app/services/nutritionApi';
 
 export default function TrackerPage() {
-  const { intakeData, aiPlan } = useIntake();
+  const { state } = useIntake();
+  const { logMeal } = useDailyProgress();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,6 @@ export default function TrackerPage() {
   const handleAddMeal = () => {
     if (!selectedFood || !servingSize) return;
 
-    // Calculate nutrition for selected serving size
     const nutritionPerServing = {
       calories: selectedFood.nf_calories,
       protein: selectedFood.nf_protein,
@@ -53,17 +53,14 @@ export default function TrackerPage() {
     };
 
     const totalNutrition = {
-      calories: nutritionPerServing.calories * servingSize,
-      protein: nutritionPerServing.protein * servingSize,
-      carbs: nutritionPerServing.carbs * servingSize,
-      fats: nutritionPerServing.fats * servingSize
+      calories: Math.round(nutritionPerServing.calories * servingSize),
+      protein: Math.round((nutritionPerServing.protein || 0) * servingSize * 10) / 10,
+      carbs: Math.round((nutritionPerServing.carbs || 0) * servingSize * 10) / 10,
+      fats: Math.round((nutritionPerServing.fats || 0) * servingSize * 10) / 10
     };
 
-    // Add to daily log via context
-    const { logMeal } = useIntake();
     logMeal(selectedFood.food_name, totalNutrition);
 
-    // Reset form
     setSelectedFood(null);
     setServingSize(1);
     setQuery('');

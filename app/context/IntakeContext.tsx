@@ -1,15 +1,14 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { 
   IntakeData, 
   AiPlan, 
   DailyLog, 
   DailyProgress,
   LOCAL_STORAGE_KEYS
-} from '@/lib/types';
+} from '@/app/lib/types';
 
-// Define the state shape
 interface IntakeState {
   intakeData: IntakeData | null;
   aiPlan: AiPlan | null;
@@ -19,7 +18,6 @@ interface IntakeState {
   error: string | null;
 }
 
-// Define action types
 type IntakeAction =
   | { type: 'SET_INTAKE_DATA'; payload: IntakeData }
   | { type: 'SET_AI_PLAN'; payload: AiPlan }
@@ -31,19 +29,28 @@ type IntakeAction =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'CLEAR_ALL' };
 
-// Initial state from localStorage or defaults
 const getInitialState = (): IntakeState => {
+  if (typeof window === 'undefined') {
+    return {
+      intakeData: null,
+      aiPlan: null,
+      dailyLogs: [],
+      dailyProgress: [],
+      loading: false,
+      error: null,
+    };
+  }
+  
   try {
     const intakeData = localStorage.getItem(LOCAL_STORAGE_KEYS.INTAKE_DATA);
     const aiPlan = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_PLAN);
     const dailyLogs = localStorage.getItem(LOCAL_STORAGE_KEYS.DAILY_LOGS);
-    const userProfile = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_PROFILE);
 
     return {
       intakeData: intakeData ? JSON.parse(intakeData) : null,
       aiPlan: aiPlan ? JSON.parse(aiPlan) : null,
       dailyLogs: dailyLogs ? JSON.parse(dailyLogs) : [],
-      dailyProgress: [], // We'll compute this from dailyLogs or leave empty for now
+      dailyProgress: [],
       loading: false,
       error: null,
     };
@@ -60,7 +67,6 @@ const getInitialState = (): IntakeState => {
   }
 };
 
-// Reducer function
 const intakeReducer = (state: IntakeState, action: IntakeAction): IntakeState => {
   switch (action.type) {
     case 'SET_INTAKE_DATA':
@@ -78,10 +84,9 @@ const intakeReducer = (state: IntakeState, action: IntakeAction): IntakeState =>
         error: null,
       };
     case 'ADD_DAILY_LOG':
-      const newLogs = [...state.dailyLogs, action.payload];
       return {
         ...state,
-        dailyLogs: newLogs,
+        dailyLogs: [...state.dailyLogs, action.payload],
         loading: false,
         error: null,
       };
@@ -93,10 +98,9 @@ const intakeReducer = (state: IntakeState, action: IntakeAction): IntakeState =>
         error: null,
       };
     case 'ADD_DAILY_PROGRESS':
-      const newProgress = [...state.dailyProgress, action.payload];
       return {
         ...state,
-        dailyProgress: newProgress,
+        dailyProgress: [...state.dailyProgress, action.payload],
         loading: false,
         error: null,
       };
@@ -119,6 +123,11 @@ const intakeReducer = (state: IntakeState, action: IntakeAction): IntakeState =>
         loading: false,
       };
     case 'CLEAR_ALL':
+      if (typeof window !== 'undefined') {
+        Object.values(LOCAL_STORAGE_KEYS).forEach(key => {
+          localStorage.removeItem(key);
+        });
+      }
       return {
         intakeData: null,
         aiPlan: null,
@@ -132,45 +141,64 @@ const intakeReducer = (state: IntakeState, action: IntakeAction): IntakeState =>
   }
 };
 
-// Create context
-const IntakeContext = createContext<{
+interface IntakeContextValue {
   state: IntakeState;
   dispatch: React.Dispatch<IntakeAction>;
-} | undefined>(undefined);
+  setIntakeData: (data: IntakeData) => void;
+  setAiPlan: (plan: AiPlan) => void;
+  clearAll: () => void;
+}
 
-// Provider component
+const IntakeContext = createContext<IntakeContextValue | undefined>(undefined);
+
 export const IntakeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(intakeReducer, getInitialState());
+  const [state, dispatch] = useReducer(intakeReducer, null, getInitialState);
 
-  // Persist state to localStorage whenever it changes
+  const setIntakeData = useCallback((data: IntakeData) => {
+    dispatch({ type: 'SET_INTAKE_DATA', payload: data });
+  }, []);
+
+  const setAiPlan = useCallback((plan: AiPlan) => {
+    dispatch({ type: 'SET_AI_PLAN', payload: plan });
+  }, []);
+
+  const clearAll = useCallback(() => {
+    dispatch({ type: 'CLEAR_ALL' });
+  }, []);
+
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     try {
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.INTAKE_DATA,
-        JSON.stringify(state.intakeData)
-      );
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.AI_PLAN,
-        JSON.stringify(state.aiPlan)
-      );
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.DAILY_LOGS,
-        JSON.stringify(state.dailyLogs)
-      );
-      // Note: We don't persist dailyProgress as it can be recomputed from logs if needed
+      if (state.intakeData) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.INTAKE_DATA, JSON.stringify(state.intakeData));
+      }
+      if (state.aiPlan) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.AI_PLAN, JSON.stringify(state.aiPlan));
+      }
+      if (state.dailyLogs.length > 0) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.DAILY_LOGS, JSON.stringify(state.dailyLogs));
+      }
     } catch (e) {
       console.error('Failed to save state to localStorage', e);
     }
   }, [state.intakeData, state.aiPlan, state.dailyLogs]);
 
+  const value: IntakeContextValue = {
+    state,
+    dispatch,
+    setIntakeData,
+    setAiPlan,
+    clearAll,
+  };
+
   return (
-    <IntakeContext.Provider value={{ state, dispatch }}>
+    <IntakeContext.Provider value={value}>
       {children}
     </IntakeContext.Provider>
   );
 };
 
-// Custom hook to use the intake context
 export const useIntake = () => {
   const context = useContext(IntakeContext);
   if (!context) {
@@ -179,28 +207,21 @@ export const useIntake = () => {
   return context;
 };
 
-// Custom hook for daily progress functionality
 export const useDailyProgress = () => {
   const { state, dispatch } = useIntake();
   
-  const logMeal = (mealName: string, nutrition: { calories: number; protein: number; carbs: number; fats: number }) => {
-    // Create a daily log entry for today
+  const logMeal = useCallback((mealName: string, nutrition: { calories: number; protein: number; carbs: number; fats: number }) => {
     const today = new Date().toISOString().split('T')[0];
-    
-    // Check if we already have a log for today
     const existingLogIndex = state.dailyLogs.findIndex(log => log.date === today);
     
     if (existingLogIndex >= 0) {
-      // Update existing log
-      const updatedLog = { ...state.dailyLogs[existingLogIndex] };
+      const updatedLogs = [...state.dailyLogs];
+      const updatedLog = { ...updatedLogs[existingLogIndex] };
       
-      // Find if meal already exists in this log
       const mealIndex = updatedLog.meals.findIndex(m => m.meal === mealName);
       
       if (mealIndex >= 0) {
-        // Update existing meal
         const updatedMeal = { ...updatedLog.meals[mealIndex] };
-        // Add nutrition to existing meal
         updatedMeal.items.push({
           name: mealName,
           calories: nutrition.calories,
@@ -209,16 +230,13 @@ export const useDailyProgress = () => {
           fats: nutrition.fats
         });
         
-        // Recalculate meal totals
         updatedMeal.totalCalories = updatedMeal.items.reduce((sum, item) => sum + (item.calories || 0), 0);
         updatedMeal.totalProtein = updatedMeal.items.reduce((sum, item) => sum + (item.protein || 0), 0);
         updatedMeal.totalCarbs = updatedMeal.items.reduce((sum, item) => sum + (item.carbs || 0), 0);
         updatedMeal.totalFats = updatedMeal.items.reduce((sum, item) => sum + (item.fats || 0), 0);
         
-        // Update the meal in the log
         updatedLog.meals[mealIndex] = updatedMeal;
       } else {
-        // Add new meal
         updatedLog.meals.push({
           meal: mealName,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -236,12 +254,9 @@ export const useDailyProgress = () => {
         });
       }
       
-      // Update water intake and notes if needed (keeping existing)
-      const updatedLogs = [...state.dailyLogs];
       updatedLogs[existingLogIndex] = updatedLog;
       dispatch({ type: 'SET_DAILY_LOGS', payload: updatedLogs });
     } else {
-      // Create new log for today
       const newLog: DailyLog = {
         date: today,
         meals: [{
@@ -265,15 +280,11 @@ export const useDailyProgress = () => {
       
       dispatch({ type: 'ADD_DAILY_LOG', payload: newLog });
     }
-    
-    // Update daily progress
-    updateDailyProgress();
-  };
+  }, [state.dailyLogs, dispatch]);
   
-  const updateDailyProgress = () => {
+  const updateDailyProgress = useCallback(() => {
     if (!state.aiPlan) return;
     
-    // Group logs by date
     const progressByDate: Record<string, DailyProgress> = {};
     
     state.dailyLogs.forEach(log => {
@@ -292,7 +303,6 @@ export const useDailyProgress = () => {
         };
       }
       
-      // Sum up nutrition from all meals in this log
       log.meals.forEach(meal => {
         progressByDate[date].caloriesConsumed += meal.totalCalories;
         progressByDate[date].proteinConsumed += meal.totalProtein || 0;
@@ -301,21 +311,19 @@ export const useDailyProgress = () => {
       });
     });
     
-    // Convert to array and sort by date (newest first)
     const progressArray = Object.values(progressByDate)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
     dispatch({ type: 'SET_DAILY_PROGRESS', payload: progressArray });
-  };
+  }, [state.dailyLogs, state.aiPlan, dispatch]);
   
-  const setDailyProgress = (progress: DailyProgress[]) => {
+  const setDailyProgress = useCallback((progress: DailyProgress[]) => {
     dispatch({ type: 'SET_DAILY_PROGRESS', payload: progress });
-  };
+  }, [dispatch]);
   
-  // Initialize daily progress from existing logs
   useEffect(() => {
     updateDailyProgress();
-  }, [state.dailyLogs, state.aiPlan]);
+  }, [updateDailyProgress]);
   
   return {
     dailyProgress: state.dailyProgress,

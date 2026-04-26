@@ -1,10 +1,14 @@
+'use client';
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useIntake } from '@/app/context/IntakeContext';
 import { generateAiPlan } from '@/app/services/aiPlan';
+import { generateAlgorithmicMealPlan } from '@/app/lib/nutrition';
 
 export default function GeneratingPage() {
-  const { intakeData, setAiPlan } = useIntake();
+  const { state, setAiPlan } = useIntake();
+  const intakeData = state.intakeData;
   const router = useRouter();
 
   useEffect(() => {
@@ -12,7 +16,6 @@ export default function GeneratingPage() {
 
     async function generatePlan() {
       try {
-        // Try to generate AI plan
         const aiPlan = await generateAiPlan(intakeData);
         if (!isCancelled) {
           setAiPlan(aiPlan);
@@ -20,9 +23,7 @@ export default function GeneratingPage() {
         }
       } catch (error) {
         console.error('Failed to generate AI plan:', error);
-        // Fallback to algorithmic plan
         try {
-          const { generateAlgorithmicMealPlan } from '@/app/lib/nutrition';
           const algorithmicPlan = generateAlgorithmicMealPlan(intakeData);
           if (!isCancelled) {
             setAiPlan(algorithmicPlan);
@@ -31,7 +32,7 @@ export default function GeneratingPage() {
         } catch (fallbackError) {
           console.error('Failed to generate fallback plan:', fallbackError);
           if (!isCancelled) {
-            router.push('/dashboard'); // Still redirect even if fallback fails
+            router.push('/dashboard');
           }
         }
       }
