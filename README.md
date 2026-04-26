@@ -1,12 +1,13 @@
-# AI-Nutrition-App
+# 🍎 AI-Nutrition-App (Swaad AI)
 
 ![Project Demo](./Screenshot.png)
 
-> An intelligent nutrition tracking application built with **Next.js 14**, featuring AI-powered meal analysis and personalized diet recommendations.
+> An intelligent nutrition tracking application built with **Next.js 14**, featuring AI-powered meal analysis and personalized diet recommendations tailored for Indian regional cuisine.
 
 ---
 
-## Table of Contents
+## 📋 Table of Contents
+
 - [🚀 Tech Stack](#tech-stack)
 - [✨ Features](#features)
 - [📁 Project Structure](#project-structure)
@@ -15,6 +16,7 @@
 - [📊 Stats & Analytics](#stats--analytics)
 - [🔧 Development Commands](#development-commands)
 - [📋 API Reference](#api-reference)
+- [🧮 Nutritional Science Logic](#nutritional-science-logic)
 - [🤝 Contributing](#contributing)
 - [📄 License](#license)
 
@@ -22,27 +24,32 @@
 
 ## 🚀 Tech Stack
 
-### **Development Stack**
+### **Framework & Language**
 | Category | Technology |
 |----------|------------|
-| **Framework** | Next.js 14.2.3 |
+| **Framework** | Next.js 14.2.3 (App Router) |
 | **Language** | TypeScript 5.x |
 | **UI Runtime** | React 18.x |
 | **Styling** | Tailwind CSS 3.4.1 |
 | **Validation** | Zod 3.23.8 |
 
-### **Core Dependencies**
-- **React** - UI component library
-- **Next.js** - React framework with SSR
-- **date-fns** - Date manipulation utilities
-- **clsx** - Conditional className utility
-- **tailwind-merge** - Tailwind class merging
+### **Core Dependencies** ⭐
+| Package | Purpose |
+|---------|---------|
+| `react` | UI component library |
+| `next` | React framework with SSR/SSG |
+| `date-fns` | Date manipulation utilities |
+| `clsx` | Conditional className utility |
+| `tailwind-merge` | Tailwind class merging |
+| `zod` | Schema validation |
 
-### **Development Tools**
-- **ESLint** - Code linting
-- **TypeScript** - Type safety
-- **PostCSS** - CSS processing
-- **Autoprefixer** - CSS vendor prefixes
+### **Development Tools** 🛠️
+| Tool | Purpose |
+|------|---------|
+| `ESLint` | Code linting & best practices |
+| `TypeScript` | Type safety & IntelliSense |
+| `PostCSS` | CSS processing |
+| `Autoprefixer` | CSS vendor prefixes |
 
 ---
 
@@ -50,50 +57,56 @@
 
 ### 🔵 Core Features
 
-#### **AI-Powered Meal Analysis**
-- **Gemini API Integration** - Intelligent nutrition insights using Google's Gemini AI
-- **Mock AI Service** - Fallback service for development and testing without API keys
-- **Natural Language Processing** - Parse food descriptions into nutritional data
-- **Smart Recommendations** - AI-generated diet suggestions based on user goals
+#### 🤖 **AI-Powered Meal Analysis**
+- ✨ **Gemini API Integration** - Intelligent nutrition insights using Google's Gemini AI
+- ✨ **Mock AI Service** - Fallback service for development without API keys
+- ✨ **Natural Language Processing** - Parse food descriptions into nutritional data
+- ✨ **Smart Recommendations** - AI-generated diet suggestions based on user goals
+- ✨ **Evidence-Based Advice** - Nutrition advice formatted as structured JSON
 
-#### **User Onboarding**
-- **Multi-step Intake Form** - 3-step onboarding process
-  - Step 1: Basic profile (age, weight, height)
-  - Step 2: Goal setting (weight loss, maintenance, muscle gain)
-  - Step 3: Dietary preferences (vegetarian, vegan, etc.)
-- **Health Condition Tracking** - Monitor dietary restrictions and health issues
-- **Personalized Goals** - Custom calorie and macro targets
+#### 👤 **User Onboarding** (3-Step Process)
+- **Step 1: Basic Profile**
+  - Age, Gender, Height (cm), Weight (kg)
+  - BMI calculation with category classification
+- **Step 2: Goal Setting**
+  - Goals: Weight Loss | Maintenance | Muscle Gain
+  - Activity Levels: Sedentary → Extra Active
+- **Step 3: Dietary Preferences**
+  - Diet Types: Vegetarian, Non-Veg, Vegan, Jain, Maharashtrian
+  - Allergies: Dairy, Gluten, Nuts, Soy, Shellfish, etc.
+  - Favorite cheat foods for moderation tips
 
-#### **Dashboard & Analytics**
-- **Daily Calorie Tracking** - Real-time calorie consumption monitoring
-- **Macro Nutrient Breakdown** - Proteins, Carbohydrates, Fats tracking
-- **Visual Progress Indicators** - Charts and progress bars
-- **Calorie Goal Comparison** - Actual vs target calorie intake
+#### 📊 **Dashboard & Analytics**
+- ⭐ **Daily Calorie Tracking** - Real-time consumption monitoring
+- ⭐ **Macro Nutrient Breakdown** - Protein, Carbs, Fats tracking
+- ⭐ **Visual Progress Bars** - CSS-based animated progress indicators
+- ⭐ **Calorie Goal Comparison** - Consumed vs Target with percentage
+- ⭐ **Today's Meal Plan** - AI-generated meal suggestions
 
-#### **Intake Tracking**
-- **Meal Logging** - Log meals with complete nutritional data
-- **Food Search** - Search and add food items from database
-- **Portion Control** - Customizable serving sizes
-- **Meal Categorization** - Breakfast, Lunch, Dinner, Snacks
+#### 🍽️ **Intake Tracking**
+- 📌 **Meal Logging** - Log meals with complete nutritional data
+- 📌 **Food Search** - Search from built-in Indian food database (500+ items)
+- 📌 **Portion Control** - Customizable serving sizes (0.1 - 50 servings)
+- 📌 **Meal Categorization** - Breakfast, Lunch, Snack, Dinner
+- 📌 **Daily History** - View past meals organized by date
 
 ---
 
 ### 🟢 UI Components
 
-| Component | Description |
-|-----------|-------------|
-| **Accordion UI** | Collapsible content sections |
-| **Badge UI** | Status and label indicators |
-| **Button UI** | Primary and secondary actions |
-| **Card UI** | Content containers |
-| **Input UI** | Form input fields |
-| **Label UI** | Form field labels |
-| **Native Select UI** | Dropdown selectors |
-| **Progress UI** | Progress indicators |
-| **Radio Group UI** | Option selection |
-| **Skeleton UI** | Loading placeholders |
-| **Tabs UI** | Tabbed navigation |
-| **AI Helper Component** | AI chat interface |
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **Button** | ✅ | Primary and secondary action buttons |
+| **Card** | ✅ | Content containers with shadows |
+| **Input** | ✅ | Form input fields with focus states |
+| **Label** | ✅ | Form field labels |
+| **Badge** | ✅ | Status and label indicators |
+| **Accordion** | ✅ | Collapsible content sections |
+| **Progress** | ✅ | Progress bar indicators |
+| **Tabs** | ✅ | Tabbed navigation |
+| **Radio Group** | ✅ | Option selection |
+| **Skeleton** | ✅ | Loading placeholders |
+| **Select** | ✅ | Native dropdown selectors |
 
 ---
 
@@ -103,33 +116,48 @@
 AI-Nutrition-App/
 ├── app/
 │   ├── components/
-│   │   └── ui/                    # Reusable UI components
-│   │       ├── button.tsx
-│   │       ├── card.tsx
-│   │       ├── input.tsx
-│   │       └── label.tsx
+│   │   └── ui/                      # Reusable UI components
+│   │       ├── button.tsx            # Button component
+│   │       ├── card.tsx             # Card component
+│   │       ├── input.tsx            # Input component
+│   │       └── label.tsx            # Label component
 │   ├── context/
-│   │   └── IntakeContext.tsx      # Global state management
+│   │   └── IntakeContext.tsx        # Global state (React Context API)
 │   ├── lib/
-│   │   ├── constants.ts           # App constants & config
-│   │   ├── types.ts               # TypeScript interfaces
-│   │   ├── utils.ts               # Utility functions
-│   │   ├── validation.ts          # Zod schemas
-│   │   └── nutrition.ts           # Nutrition calculations
+│   │   ├── constants.ts             # App constants, diet types, activity levels
+│   │   ├── types.ts                 # TypeScript interfaces (IntakeData, AiPlan, etc.)
+│   │   ├── utils.ts                 # Utility functions (formatDate, storage, etc.)
+│   │   ├── validation.ts            # Zod validation schemas
+│   │   ├── nutrition.ts             # BMR, TDEE, macro calculations
+│   │   └── errors.ts                # Custom error classes
 │   ├── services/
-│   │   ├── gemini.ts              # Gemini AI API integration
-│   │   ├── mockAi.ts              # Mock AI service
-│   │   ├── nutritionApi.ts        # Nutrition data API
-│   │   └── fetchWithRetry.ts     # API fetch utility
-│   ├── globals.css                # Global styles
-│   ├── layout.tsx                 # Root layout
-│   └── page.tsx                   # Home page
-├── public/                        # Static assets
-├── tailwind.config.ts             # Tailwind configuration
-├── postcss.config.js              # PostCSS configuration
-├── tsconfig.json                  # TypeScript configuration
-├── package.json                   # Dependencies
-└── README.md                      # Project documentation
+│   │   ├── gemini.ts                # Gemini AI API integration
+│   │   ├── mockAi.ts                # Mock AI service for fallback
+│   │   ├── aiPlan.ts                # AI meal plan generation
+│   │   ├── nutritionApi.ts          # Nutrition data search (500+ Indian foods)
+│   │   └── fetchWithRetry.ts        # HTTP client with retry logic
+│   ├── dashboard/
+│   │   └── page.tsx                 # Main dashboard with progress tracking
+│   ├── tracker/
+│   │   └── page.tsx                 # Food search and meal logging
+│   ├── history/
+│   │   └── page.tsx                 # Historical meal logs
+│   ├── onboarding/
+│   │   └── page.tsx                 # 3-step user onboarding form
+│   ├── generating/
+│   │   └── page.tsx                 # AI plan generation loading screen
+│   ├── landing/
+│   │   └── page.tsx                 # Landing/welcome page
+│   ├── globals.css                  # Global Tailwind styles
+│   ├── layout.tsx                   # Root layout with providers
+│   └── page.tsx                     # Entry point
+├── public/                          # Static assets
+├── tailwind.config.ts              # Tailwind CSS configuration
+├── postcss.config.js               # PostCSS configuration
+├── tsconfig.json                   # TypeScript configuration
+├── package.json                    # Dependencies
+├── .gitignore                      # Git ignore rules
+└── README.md                       # Project documentation
 ```
 
 ---
@@ -138,21 +166,23 @@ AI-Nutrition-App/
 
 ### ✅ Prerequisites
 
-- **Node.js** 18.x or higher
-- **npm** or **yarn** package manager
-- **Git** for version control
-- **Gemini API Key** (optional - for AI features)
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| **Node.js** | 18.x or higher | LTS recommended |
+| **npm** | 9.x+ | Comes with Node.js |
+| **Git** | 2.x+ | For version control |
+| **Gemini API Key** | Optional | For AI features |
 
 ### 📥 Installation
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/girishlade111/AI-Nutrition-App.git
 
-# Navigate to project directory
+# 2. Navigate to project directory
 cd AI-Nutrition-App
 
-# Install dependencies
+# 3. Install dependencies
 npm install
 
 # OR using yarn
@@ -165,8 +195,21 @@ yarn install
 # Start development server
 npm run dev
 
-# Open browser
-# Visit: http://localhost:3000
+# Open browser and visit:
+http://localhost:3000
+```
+
+### 🔨 Build for Production
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm run start
+
+# Run linting checks
+npm run lint
 ```
 
 ---
@@ -181,39 +224,47 @@ Create a `.env.local` file in the root directory:
 # ===========================================
 # Gemini API Configuration (Optional)
 # ===========================================
-
-# Your Gemini API key from Google AI Studio
-# Get it from: https://makersuite.google.com/app/apikey
+# Get your API key from: https://makersuite.google.com/app/apikey
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# ===========================================
+# Nutritionix API (Optional)
+# ===========================================
+NEXT_PUBLIC_NUTRITIONIX_APP_ID=your_app_id
+NEXT_PUBLIC_NUTRITIONIX_API_KEY=your_api_key
 
 # ===========================================
 # Application Settings
 # ===========================================
-
-# App name
-NEXT_PUBLIC_APP_NAME=AI Nutrition App
-
-# Default timezone
+NEXT_PUBLIC_APP_NAME=Swaad AI
 NEXT_PUBLIC_TIMEZONE=Asia/Kolkata
 ```
 
-> **⚠️ Important**: The app works without `GEMINI_API_KEY` - it will use the Mock AI service instead for development.
+> **⚠️ Important**: The app works **without** `GEMINI_API_KEY` - it uses the Mock AI service as fallback.
 
 ### 🎨 Tailwind Configuration
 
-The project includes **custom Tailwind configuration**:
+The project uses **custom Tailwind configuration** with:
 
-- **Custom Color Palette** - Primary, secondary, and accent colors
-- **Responsive Breakpoints** - Mobile, tablet, desktop
-- **Custom Animations** - Fade, slide, pulse effects
-- **Extended Utilities** - Custom spacing and typography
+- ✅ **Custom Color Palette** - Indigo primary, gray neutrals
+- ✅ **Responsive Breakpoints** - sm, md, lg, xl, 2xl
+- ✅ **Custom Animations** - spin, fade utilities
+- ✅ **Extended Utilities** - Custom spacing, typography
 
 ### 📘 TypeScript Configuration
 
-- **Strict Mode** - Enabled for type safety
-- **Path Aliases** - `@/*` maps to `app/*`
-- **JSX Mode** - Preserved for Next.js compatibility
-- **Module Resolution** - NodeNext
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
 
 ---
 
@@ -229,83 +280,114 @@ The project includes **custom Tailwind configuration**:
 | **Node Version** | 18.x+ |
 | **Next.js Version** | 14.2.3 |
 
+### 🗂️ Code Statistics
+
+| Category | Files | Lines |
+|----------|-------|-------|
+| TypeScript | 22 | ~3,000 |
+| Components | 12 | ~1,500 |
+| Services | 5 | ~1,200 |
+| Utilities | 5 | ~800 |
+
 ### 🌐 Browser Support
 
-| Browser | Version |
-|---------|---------|
-| Chrome | 90+ |
-| Firefox | 88+ |
-| Safari | 14+ |
-| Edge | 90+ |
+| Browser | Version | Support |
+|---------|---------|---------|
+| Chrome | 90+ | ✅ Full |
+| Firefox | 88+ | ✅ Full |
+| Safari | 14+ | ✅ Full |
+| Edge | 90+ | ✅ Full |
 
 ### ⚡ Performance Optimizations
 
-- ✅ **Server-Side Rendering** - Next.js 14 SSR
+- ✅ **Server-Side Rendering** - Next.js 14 SSR for SEO
 - ✅ **Code Splitting** - Automatic route-based splitting
-- ✅ **Tailwind Pruning** - Remove unused styles
+- ✅ **Tailwind Pruning** - Removes unused CSS
 - ✅ **Image Optimization** - Next.js Image component
-- ✅ **Bundle Analysis** - Optimized imports
+- ✅ **Bundle Optimization** - Tree shaking enabled
 
 ---
 
 ## 🔧 Development Commands
 
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `npm run dev` | Start development server | `npm run dev` |
-| `npm run build` | Build for production | `npm run build` |
-| `npm run start` | Start production server | `npm run start` |
-| `npm run lint` | Run ESLint checks | `npm run lint` |
-
-### 📋 Available Scripts
-
-```json
-{
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  }
-}
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server (http://localhost:3000) |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint checks |
 
 ---
 
 ## 📋 API Reference
 
-### Services
+### Services Layer
 
-| Service | Description |
-|---------|-------------|
-| **gemini.ts** | Gemini AI API client |
-| **mockAi.ts** | Mock AI for development |
-| **nutritionApi.ts** | Nutrition data fetching |
-| **fetchWithRetry.ts** | HTTP client with retry logic |
+| File | Function | Description |
+|------|----------|-------------|
+| `gemini.ts` | `callGemini()` | Make requests to Gemini AI API |
+| `mockAi.ts` | `getMockResponse()` | Generate mock AI responses |
+| `aiPlan.ts` | `generateAiPlan()` | Create personalized meal plans |
+| `nutritionApi.ts` | `searchFoodNutrition()` | Search food nutrition data |
+| `fetchWithRetry.ts` | `fetchWithRetry()` | HTTP requests with retry logic |
 
-### Context
+### Context API
 
-| Context | Description |
-|---------|-------------|
-| **IntakeContext** | Global intake/meal tracking state |
+| Context | Provider | Description |
+|---------|-----------|-------------|
+| `IntakeContext` | `IntakeProvider` | Global state for user data, AI plan, daily logs |
 
-### Utilities
+### Utility Functions
 
-| Utility | Description |
-|---------|-------------|
-| **nutrition.ts** | Calorie & macro calculations |
-| **validation.ts** | Zod form validation schemas |
-| **utils.ts** | General utility functions |
-| **constants.ts** | App-wide constants |
+| File | Functions |
+|------|------------|
+| `nutrition.ts` | `calculateBMR()`, `calculateTDEE()`, `calculateCalorieTarget()`, `calculateMacroTargets()`, `generateAlgorithmicMealPlan()` |
+| `validation.ts` | `intakeStep1Schema`, `intakeStep2Schema`, `intakeStep3Schema`, `validateInput()` |
+| `utils.ts` | `cn()`, `storage`, `formatDate()`, `calculatePercentage()`, `unitConversions` |
+| `constants.ts` | `DIET_TYPES`, `ACTIVITY_LEVELS`, `GOALS`, `MACRO_RATIOS`, `LOCAL_STORAGE_KEYS` |
+
+---
+
+## 🧮 Nutritional Science Logic
+
+### 🔬 BMR Calculation (Mifflin-St Jeor Equation)
+```
+For Males:   BMR = 10 × weight(kg) + 6.25 × height(cm) - 5 × age + 5
+For Females: BMR = 10 × weight(kg) + 6.25 × height(cm) - 5 × age - 161
+```
+
+### 📈 TDEE Calculation
+```
+TDEE = BMR × Activity Multiplier
+- Sedentary: 1.2
+- Light: 1.375
+- Moderate: 1.55
+- Very Active: 1.725
+- Extra Active: 1.9
+```
+
+### 🎯 Calorie Targets
+```
+Weight Loss:    TDEE - 500 kcal
+Maintenance:    TDEE + 0 kcal
+Weight Gain:    TDEE + 300 kcal
+```
+
+### 🥗 Macro Ratios
+```
+Weight Loss:    Protein 35% | Carbs 35% | Fats 30%
+Maintenance:    Protein 30% | Carbs 40% | Fats 30%
+Weight Gain:    Protein 30% | Carbs 45% | Fats 25%
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
+We welcome contributions! Here's how to help:
 
 1. **Fork** the repository
-2. **Clone** your fork locally:
+2. **Clone** your fork:
    ```bash
    git clone https://github.com/girishlade111/AI-Nutrition-App.git
    ```
@@ -325,7 +407,7 @@ We welcome contributions! Here's how you can help:
 
 ### 🐛 Bug Reports
 
-Please use GitHub Issues to report bugs. Include:
+Please use GitHub Issues with:
 - Detailed description
 - Steps to reproduce
 - Expected vs actual behavior
@@ -340,10 +422,14 @@ Please use GitHub Issues to report bugs. Include:
 
 ## 🙋‍♂️ Support
 
-- 📧 Email: girishlade111@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/girishlade111/AI-Nutrition-App/issues)
-- 📖 Documentation: [Wiki](https://github.com/girishlade111/AI-Nutrition-App/wiki)
+- 📧 **Email**: girishlade111@gmail.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/girishlade111/AI-Nutrition-App/issues)
+- 📖 **Wiki**: [Wiki](https://github.com/girishlade111/AI-Nutrition-App/wiki)
 
 ---
 
-**Built with ❤️ using Next.js 14 & Gemini AI** | [View on GitHub](https://github.com/girishlade111/AI-Nutrition-App)
+**Built with ❤️ using Next.js 14, React 18 & Gemini AI**
+
+🔗 [View on GitHub](https://github.com/girishlade111/AI-Nutrition-App) | 
+🔗 [Live Demo](#) | 
+🔗 [Documentation](#)
