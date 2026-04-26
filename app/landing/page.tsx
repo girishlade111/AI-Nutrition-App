@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import SocialIcons from '../components/social-icons';
 
 export default function LandingPage() {
   return (
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <p className="mt-4 text-sm text-gray-500">
           Track your nutrition with AI-powered personalized meal plans
         </p>
+        <SocialIcons />
       </div>
     </div>
   );
