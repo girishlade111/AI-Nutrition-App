@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -6,7 +8,6 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to landing page by default
     if (pathname === '/') {
       router.push('/landing');
     }
