@@ -1,8 +1,18 @@
-# 🍎 AI-Nutrition-App (Swaad AI)
+# 🍎 Swaad AI - AI Nutrition App for Maharashtra
+
+<div align="center">
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 ![Project Demo](./Screenshot.png)
 
-> An intelligent nutrition tracking application built with **Next.js 14**, featuring AI-powered meal analysis and personalized diet recommendations tailored for Indian regional cuisine.
+</div>
+
+> An intelligent nutrition tracking application built with **Next.js 14**, featuring AI-powered meal analysis and personalized diet recommendations tailored for **Maharashtra** and **Indian regional cuisine**.
 
 ---
 
@@ -17,6 +27,7 @@
 - [🔧 Development Commands](#development-commands)
 - [📋 API Reference](#api-reference)
 - [🧮 Nutritional Science Logic](#nutritional-science-logic)
+- [🔍 SEO Optimization](#seo-optimization)
 - [🤝 Contributing](#contributing)
 - [📄 License](#license)
 
@@ -24,7 +35,7 @@
 
 ## 🚀 Tech Stack
 
-### **Framework & Language**
+### **Framework & Language** 🔹
 | Category | Technology |
 |----------|------------|
 | **Framework** | Next.js 14.2.3 (App Router) |
@@ -90,6 +101,14 @@
 - 📌 **Meal Categorization** - Breakfast, Lunch, Snack, Dinner
 - 📌 **Daily History** - View past meals organized by date
 
+#### 🔗 **Social Media Integration**
+- 🌐 **Instagram** - [girish_lade_](https://www.instagram.com/girish_lade_/)
+- 💼 **LinkedIn** - [girish-lade-075bba201](https://www.linkedin.com/in/girish-lade-075bba201/)
+- 💻 **GitHub** - [girishlade111](https://github.com/girishlade111)
+- ✏️ **CodePen** - [Girish-Lade-the-looper](https://codepen.io/Girish-Lade-the-looper)
+- 📧 **Email** - [admin@ladestack.in](mailto:admin@ladestack.in)
+- 🌍 **Website** - [ladestack.in](https://ladestack.in)
+
 ---
 
 ### 🟢 UI Components
@@ -116,11 +135,12 @@
 AI-Nutrition-App/
 ├── app/
 │   ├── components/
-│   │   └── ui/                      # Reusable UI components
-│   │       ├── button.tsx            # Button component
-│   │       ├── card.tsx             # Card component
-│   │       ├── input.tsx            # Input component
-│   │       └── label.tsx            # Label component
+│   │   ├── ui/                      # Reusable UI components
+│   │   │   ├── button.tsx            # Button component
+│   │   │   ├── card.tsx             # Card component
+│   │   │   ├── input.tsx            # Input component
+│   │   │   └── label.tsx            # Label component
+│   │   └── social-icons.tsx         # Social media links
 │   ├── context/
 │   │   └── IntakeContext.tsx        # Global state (React Context API)
 │   ├── lib/
@@ -150,8 +170,11 @@ AI-Nutrition-App/
 │   │   └── page.tsx                 # Landing/welcome page
 │   ├── globals.css                  # Global Tailwind styles
 │   ├── layout.tsx                   # Root layout with providers
-│   └── page.tsx                     # Entry point
-├── public/                          # Static assets
+│   ├── page.tsx                     # Entry point
+│   └── sitemap.ts                   # Dynamic sitemap.xml
+├── public/
+│   ├── robots.txt                   # SEO robots.txt
+│   └── og-image.png                 # Open Graph image
 ├── tailwind.config.ts              # Tailwind CSS configuration
 ├── postcss.config.js               # PostCSS configuration
 ├── tsconfig.json                   # TypeScript configuration
@@ -305,6 +328,7 @@ The project uses **custom Tailwind configuration** with:
 - ✅ **Tailwind Pruning** - Removes unused CSS
 - ✅ **Image Optimization** - Next.js Image component
 - ✅ **Bundle Optimization** - Tree shaking enabled
+- ✅ **SEO Optimized** - Meta tags, Open Graph, sitemap, robots.txt
 
 ---
 
@@ -382,6 +406,33 @@ Weight Gain:    Protein 30% | Carbs 45% | Fats 25%
 
 ---
 
+## 🔍 SEO Optimization
+
+### ✅ Implemented SEO Features
+
+- ✅ **Meta Tags** - Long and short form meta descriptions
+- ✅ **Open Graph** - Social media preview images and cards
+- ✅ **Twitter Cards** - Twitter preview functionality
+- ✅ **Robots.txt** - Allows all crawlers
+- ✅ **Sitemap.xml** - Auto-generated for all routes
+- ✅ **Canonical URLs** - Prevents duplicate content
+- ✅ **Structured Data** - Schema markup ready
+- ✅ **Semantic HTML** - Proper heading hierarchy
+
+### 📄 Sitemap Pages
+
+| Route | Priority | Change Frequency |
+|-------|----------|------------------|
+| `/` | 1.0 | weekly |
+| `/landing` | 0.8 | weekly |
+| `/onboarding` | 0.6 | monthly |
+| `/dashboard` | 0.9 | daily |
+| `/tracker` | 0.9 | daily |
+| `/history` | 0.7 | weekly |
+| `/generating` | 0.5 | monthly |
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! Here's how to help:
@@ -422,14 +473,18 @@ Please use GitHub Issues with:
 
 ## 🙋‍♂️ Support
 
-- 📧 **Email**: girishlade111@gmail.com
+- 📧 **Email**: [girishlade111@gmail.com](mailto:girishlade111@gmail.com)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/girishlade111/AI-Nutrition-App/issues)
 - 📖 **Wiki**: [Wiki](https://github.com/girishlade111/AI-Nutrition-App/wiki)
 
 ---
 
+<div align="center">
+
 **Built with ❤️ using Next.js 14, React 18 & Gemini AI**
 
-🔗 [View on GitHub](https://github.com/girishlade111/AI-Nutrition-App) | 
-🔗 [Live Demo](#) | 
-🔗 [Documentation](#)
+🔗 [View on GitHub](https://github.com/girishlade111/AI-Nutrition-App) |
+🔗 [Live Demo](https://swaad-ai.vercel.app) |
+🔗 [Documentation](https://github.com/girishlade111/AI-Nutrition-App/wiki)
+
+</div>
