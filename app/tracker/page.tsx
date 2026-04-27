@@ -1,19 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useIntake, useDailyProgress } from '@/app/context/IntakeContext';
-import { searchFoodNutrition } from '@/app/services/nutritionApi';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useIntake, useDailyProgress } from "@/app/context/IntakeContext";
+import { searchFoodNutrition } from "@/app/services/nutritionApi";
+import { Button } from "@/app/components/ui/button";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { Badge } from "@/app/components/ui/badge";
+import { FadeInUp } from "@/app/components/animations";
+import { cn } from "@/app/lib/utils";
+import {
+  Search,
+  X,
+  Plus,
+  Minus,
+  Flame,
+  Dumbbell,
+  Wheat,
+  Droplets,
+  AlertCircle,
+  ChevronLeft,
+  Check,
+} from "lucide-react";
 
 export default function TrackerPage() {
   const { state } = useIntake();
   const { logMeal } = useDailyProgress();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFood, setSelectedFood] = useState<any>(null);
   const [servingSize, setServingSize] = useState(1);
+  const [addedSuccess, setAddedSuccess] = useState(false);
   const router = useRouter();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -22,13 +42,14 @@ export default function TrackerPage() {
 
     setLoading(true);
     setError(null);
-    
+    setSelectedFood(null);
+
     try {
       const nutritionData = await searchFoodNutrition(query);
       setResults(nutritionData.foods || []);
     } catch (err) {
-      console.error('Search error:', err);
-      setError('Failed to search for food. Please try again.');
+      console.error("Search error:", err);
+      setError("Failed to search for food. Please try again.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -38,10 +59,7 @@ export default function TrackerPage() {
   const handleFoodSelect = (food: any) => {
     setSelectedFood(food);
     setServingSize(1);
-  };
-
-  const handleServingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setServingSize(parseFloat(e.target.value) || 1);
+    setAddedSuccess(false);
   };
 
   const handleAddMeal = () => {
@@ -51,174 +69,321 @@ export default function TrackerPage() {
       calories: selectedFood.nf_calories,
       protein: selectedFood.nf_protein,
       carbs: selectedFood.nf_total_carbohydrate,
-      fats: selectedFood.nf_total_fat
+      fats: selectedFood.nf_total_fat,
     };
 
     const totalNutrition = {
       calories: Math.round(nutritionPerServing.calories * servingSize),
       protein: Math.round((nutritionPerServing.protein || 0) * servingSize * 10) / 10,
       carbs: Math.round((nutritionPerServing.carbs || 0) * servingSize * 10) / 10,
-      fats: Math.round((nutritionPerServing.fats || 0) * servingSize * 10) / 10
+      fats: Math.round((nutritionPerServing.fats || 0) * servingSize * 10) / 10,
     };
 
     logMeal(selectedFood.food_name, totalNutrition);
+    setAddedSuccess(true);
 
-    setSelectedFood(null);
-    setServingSize(1);
-    setQuery('');
-    setResults([]);
+    setTimeout(() => {
+      setSelectedFood(null);
+      setServingSize(1);
+      setQuery("");
+      setResults([]);
+      setAddedSuccess(false);
+    }, 1500);
   };
 
   const handleCancel = () => {
     setSelectedFood(null);
     setServingSize(1);
     setResults([]);
+    setAddedSuccess(false);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="py-8">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Track Your Meals
-            </h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Search for foods and log your meals to track daily nutrition
-            </p>
-          </div>
-
-          {/* Search Form */}
-          <div className="mb-6">
-            <form onSubmit={handleSearch} className="space-y-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50">
+      <div className="section-padding py-8 lg:py-10">
+        <div className="container-narrow max-w-2xl">
+          {/* Header */}
+          <FadeInUp>
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Search for a food
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="e.g., apple, chicken breast, brown rice"
-                    className="w-full px-4 py-3 pl-10 pr-4 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 00-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
+                <h1 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                  Track Your Meals
+                </h1>
+                <p className="text-slate-500 mt-1">
+                  Search for foods and log your daily nutrition
+                </p>
               </div>
-              
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded">
+              <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </Button>
+            </div>
+          </FadeInUp>
+
+          {/* Search */}
+          <FadeInUp delay={0.1}>
+            <Card className="mb-6">
+              <CardContent className="p-5">
+                <form onSubmit={handleSearch} className="space-y-4">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search for a food (e.g., apple, chicken, rice)..."
+                      className="input-enhanced pl-11 pr-10"
+                    />
+                    {query && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuery("");
+                          setResults([]);
+                          setSelectedFood(null);
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={loading || !query.trim()}
+                    className="w-full"
+                  >
+                    {loading ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Search className="w-4 h-4" />
+                        </motion.div>
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        Search Foods
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </FadeInUp>
+
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mb-6"
+              >
+                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {error}
                 </div>
-              )}
-              
-              <button
-                type="submit"
-                disabled={loading || !query.trim()}
-                className="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-sm font-medium text-white rounded-md hover:bg-indigo-700"
-              >
-                {loading ? 'Searching...' : 'Search'}
-              </button>
-            </form>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Results */}
-          {results.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Search Results
-              </h2>
-              <div className="space-y-3">
-                {results.map((food: any) => (
-                  <div
-                    key={`${food.food_name}-${food.nf_calories}`}
-                    onClick={() => handleFoodSelect(food)}
-                    className={`cursor-pointer p-4 border rounded-md hover:bg-gray-50 ${selectedFood && selectedFood.food_name === food.food_name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{food.food_name}</h3>
-                        <p className="text-sm text-gray-500">
-                          {food.serving_qty} {food.serving_unit} • 
-                          {Math.round(food.nf_calories)} kcal
-                        </p>
-                      </div>
-                      <div className="text-right space-y-1">
-                        <p className="text-sm font-medium text-indigo-600">
-                          {Math.round(food.nf_protein)}g P • 
-                          {Math.round(food.nf_total_carbohydrate)}g C • 
-                          {Math.round(food.nf_total_fat)}g F
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <AnimatePresence>
+            {results.length > 0 && !selectedFood && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="mb-6"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold text-slate-900">Search Results</h2>
+                  <Badge variant="secondary">{results.length} found</Badge>
+                </div>
+                <div className="space-y-2">
+                  {results.map((food: any, i: number) => (
+                    <motion.div
+                      key={`${food.food_name}-${food.nf_calories}`}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <Card
+                        hover
+                        onClick={() => handleFoodSelect(food)}
+                        className="cursor-pointer"
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-medium text-slate-900 text-sm">
+                                {food.food_name}
+                              </h3>
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                {food.serving_qty} {food.serving_unit}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-sm font-semibold text-primary">
+                                {Math.round(food.nf_calories)} kcal
+                              </span>
+                              <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
+                                <span className="flex items-center gap-0.5">
+                                  <Dumbbell className="w-3 h-3 text-sky-500" />
+                                  {Math.round(food.nf_protein)}g
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Wheat className="w-3 h-3 text-amber-500" />
+                                  {Math.round(food.nf_total_carbohydrate)}g
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Droplets className="w-3 h-3 text-rose-500" />
+                                  {Math.round(food.nf_total_fat)}g
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Food Selection Form */}
-          {selectedFood && (
-            <div className="mb-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Add "{selectedFood.food_name}" to your log
-              </h2>
-              <div className="bg-white rounded-lg shadow sm:rounded-md p-6">
-                <div className="mb-4">
-                  <p className="text-sm text-gray-500">
-                    Serving size: {selectedFood.serving_qty} {selectedFood.serving_unit}
-                  </p>
-                  <div className="mt-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of servings
-                    </label>
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={servingSize}
-                      onChange={handleServingChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Total: {Math.round(selectedFood.nf_calories * servingSize)} kcal
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleAddMeal}
-                    disabled={!servingSize || servingSize <= 0}
-                    className="px-5 py-2 rounded-md bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700"
-                  >
-                    Add Meal
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <AnimatePresence>
+            {selectedFood && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <Card className="overflow-hidden border-primary/20 shadow-glow">
+                  <CardContent className="p-6">
+                    {addedSuccess ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-center py-8"
+                      >
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", duration: 0.5 }}
+                          className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4"
+                        >
+                          <Check className="w-8 h-8" />
+                        </motion.div>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                          Meal Added!
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          {selectedFood.food_name} has been logged to your daily intake.
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between mb-6">
+                          <div>
+                            <h3 className="font-semibold text-slate-900">
+                              {selectedFood.food_name}
+                            </h3>
+                            <p className="text-sm text-slate-500">
+                              {selectedFood.serving_qty} {selectedFood.serving_unit} per serving
+                            </p>
+                          </div>
+                          <Badge variant="default">
+                            <Flame className="w-3 h-3 mr-1" />
+                            {Math.round(selectedFood.nf_calories)} kcal
+                          </Badge>
+                        </div>
 
-          {/* Action Buttons */}
-          <div className="mt-10 flex justify-end space-x-3">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Back to Dashboard
-            </button>
-          </div>
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                          <div className="text-center p-3 bg-sky-50 rounded-lg">
+                            <Dumbbell className="w-4 h-4 text-sky-600 mx-auto mb-1" />
+                            <div className="text-sm font-semibold text-slate-900">
+                              {Math.round(selectedFood.nf_protein)}g
+                            </div>
+                            <div className="text-xs text-slate-500">Protein</div>
+                          </div>
+                          <div className="text-center p-3 bg-amber-50 rounded-lg">
+                            <Wheat className="w-4 h-4 text-amber-600 mx-auto mb-1" />
+                            <div className="text-sm font-semibold text-slate-900">
+                              {Math.round(selectedFood.nf_total_carbohydrate)}g
+                            </div>
+                            <div className="text-xs text-slate-500">Carbs</div>
+                          </div>
+                          <div className="text-center p-3 bg-rose-50 rounded-lg">
+                            <Droplets className="w-4 h-4 text-rose-600 mx-auto mb-1" />
+                            <div className="text-sm font-semibold text-slate-900">
+                              {Math.round(selectedFood.nf_total_fat)}g
+                            </div>
+                            <div className="text-xs text-slate-500">Fats</div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 mb-6">
+                          <label className="text-sm font-medium text-slate-700">
+                            Number of servings
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => setServingSize(Math.max(0.1, servingSize - 0.5))}
+                              className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <input
+                              type="number"
+                              min="0.1"
+                              step="0.1"
+                              value={servingSize}
+                              onChange={(e) => setServingSize(parseFloat(e.target.value) || 1)}
+                              className="input-enhanced text-center flex-1"
+                            />
+                            <button
+                              onClick={() => setServingSize(servingSize + 0.5)}
+                              className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <p className="text-sm text-slate-500 text-center">
+                            Total:{" "}
+                            <span className="font-semibold text-slate-900">
+                              {Math.round(selectedFood.nf_calories * servingSize)} kcal
+                            </span>
+                          </p>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <Button variant="outline" className="flex-1" onClick={handleCancel}>
+                            Cancel
+                          </Button>
+                          <Button
+                            className="flex-1"
+                            onClick={handleAddMeal}
+                            disabled={!servingSize || servingSize <= 0}
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add to Log
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
