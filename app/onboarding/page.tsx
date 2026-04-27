@@ -16,6 +16,7 @@ import {
   Salad,
   AlertCircle,
   Check,
+  Sparkles,
 } from "lucide-react";
 
 const allergiesList = [
