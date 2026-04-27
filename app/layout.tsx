@@ -1,9 +1,21 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { IntakeProvider } from "@/app/context/IntakeContext";
+import { Navigation } from "@/app/components/navigation";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-inter",
+});
+
+const dmSans = DM_Sans({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-dm-sans",
+    weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://swaad-ai.vercel.app"),
@@ -11,7 +23,8 @@ export const metadata: Metadata = {
         default: "Swaad AI - AI Nutrition App for Maharashtra",
         template: "%s | Swaad AI",
     },
-    description: "Swaad AI is an AI-powered nutrition app designed specifically for Maharashtra. Track your daily nutrition, get personalized meal plans, and monitor your health with regional Indian food preferences. Free AI nutrition tracker for Indians.",
+    description:
+        "Swaad AI is an AI-powered nutrition app designed specifically for Maharashtra. Track your daily nutrition, get personalized meal plans, and monitor your health with regional Indian food preferences.",
     keywords: [
         "AI nutrition app",
         "nutrition tracker India",
@@ -44,7 +57,8 @@ export const metadata: Metadata = {
         url: "https://swaad-ai.vercel.app",
         siteName: "Swaad AI",
         title: "Swaad AI - AI Nutrition App for Maharashtra",
-        description: "AI-powered nutrition app designed for Maharashtra. Track your daily nutrition, get personalized meal plans, and monitor your health with regional Indian food preferences.",
+        description:
+            "AI-powered nutrition app designed for Maharashtra. Track your daily nutrition, get personalized meal plans, and monitor your health with regional Indian food preferences.",
         images: [
             {
                 url: "/og-image.png",
@@ -61,9 +75,6 @@ export const metadata: Metadata = {
         images: ["/og-image.png"],
         creator: "@girish_lade_",
     },
-    verification: {
-        google: "google-site-verification-code",
-    },
     alternates: {
         canonical: "https://swaad-ai.vercel.app",
         languages: {
@@ -75,16 +86,26 @@ export const metadata: Metadata = {
     classification: "Health & Fitness",
 };
 
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    themeColor: [
+        { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+        { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    ],
+};
+
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={inter.className}>
+        <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
+            <body className="min-h-screen bg-slate-50 antialiased">
                 <IntakeProvider>
-                    <main className="w-full max-w-lg mx-auto bg-white min-h-screen shadow-2xl overflow-hidden">
+                    <Navigation />
+                    <main className="min-h-[calc(100vh-4rem)]">
                         {children}
                     </main>
                 </IntakeProvider>
