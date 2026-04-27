@@ -8,7 +8,6 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-
 </div>
 
 > An intelligent nutrition tracking application built with **Next.js 14**, featuring AI-powered meal analysis and personalized diet recommendations tailored for **Maharashtra** and **Indian regional cuisine**.
@@ -35,6 +34,7 @@
 ## 🚀 Tech Stack
 
 ### **Framework & Language** 🔹
+
 | Category | Technology |
 |----------|------------|
 | **Framework** | Next.js 14.2.3 (App Router) |
@@ -44,6 +44,7 @@
 | **Validation** | Zod 3.23.8 |
 
 ### **Core Dependencies** ⭐
+
 | Package | Purpose |
 |---------|---------|
 | `react` | UI component library |
@@ -54,6 +55,7 @@
 | `zod` | Schema validation |
 
 ### **Development Tools** 🛠️
+
 | Tool | Purpose |
 |------|---------|
 | `ESLint` | Code linting & best practices |
@@ -76,15 +78,15 @@
 
 #### 👤 **User Onboarding** (3-Step Process)
 - **Step 1: Basic Profile**
-  - Age, Gender, Height (cm), Weight (kg)
-  - BMI calculation with category classification
+  - ✓ Age, Gender, Height (cm), Weight (kg)
+  - ✓ BMI calculation with category classification
 - **Step 2: Goal Setting**
-  - Goals: Weight Loss | Maintenance | Muscle Gain
-  - Activity Levels: Sedentary → Extra Active
+  - ✓ Goals: Weight Loss | Maintenance | Muscle Gain
+  - ✓ Activity Levels: Sedentary → Extra Active
 - **Step 3: Dietary Preferences**
-  - Diet Types: Vegetarian, Non-Veg, Vegan, Jain, Maharashtrian
-  - Allergies: Dairy, Gluten, Nuts, Soy, Shellfish, etc.
-  - Favorite cheat foods for moderation tips
+  - ✓ Diet Types: Vegetarian, Non-Veg, Vegan, Jain, Maharashtrian
+  - ✓ Allergies: Dairy, Gluten, Nuts, Soy, Shellfish, etc.
+  - ✓ Favorite cheat foods for moderation tips
 
 #### 📊 **Dashboard & Analytics**
 - ⭐ **Daily Calorie Tracking** - Real-time consumption monitoring
@@ -180,6 +182,168 @@ AI-Nutrition-App/
 ├── package.json                    # Dependencies
 ├── .gitignore                      # Git ignore rules
 └── README.md                       # Project documentation
+```
+
+---
+
+## 🏗️ System Architecture
+
+### High-Level Architecture Flow
+
+```mermaid
+graph TD
+    A[User] -->|HTTP Request| B[Next.js App Router]
+    B -->|Server Components| C[React Components]
+    C -->|State Management| D[IntakeContext]
+    D -->|Data Flow| E[Local Storage]
+    
+    F[AI Service Layer] -->|API Key| G[Gemini API]
+    F -->|Fallback| H[Mock AI Service]
+    G -->|Response| I[AI Meal Plans]
+    H -->|Response| I
+    
+    J[Nutrition Data] -->|500+ Foods| K[Search API]
+    K -->|Results| C
+    
+    L[BMR/TDEE Calculator] -->|User Profile| M[Calculate Daily Targets]
+    M -->|Calories & Macros| D
+    
+    subgraph "Frontend Layer"
+    C
+    end
+    
+    subgraph "Service Layer"
+    F
+    J
+    K
+    end
+    
+    subgraph "Logic Layer"
+    L
+    M
+    end
+    
+    subgraph "Storage Layer"
+    E
+    end
+```
+
+### User Journey Flow
+
+```mermaid
+flowchart LR
+    A[Landing Page] --> B[Onboarding]
+    B -->|Step 1| C[Profile Setup]
+    B -->|Step 2| D[Goal Setting]
+    B -->|Step 3| E[Diet Preferences]
+    C --> F[Calculate BMR]
+    D --> G[Calculate TDEE]
+    E --> H[Generate AI Plan]
+    F --> I[Dashboard]
+    G --> I
+    H --> I
+    
+    I --> J[Tracker / Log Meal]
+    I --> K[View History]
+    I --> L[Daily Progress]
+```
+
+### Data Flow Diagram
+
+```mermaid
+flowchart TD
+    subgraph "Input Data"
+        A[User Profile] --> B[BMR Calculation]
+        A --> C[Activity Level]
+        C --> D[TDEE Calculation]
+    end
+    
+    subgraph "Target Calculation"
+        B --> E[Daily Calorie Target]
+        D --> E
+        E --> F[Macro Targets]
+        F -->|Protein| G[Protein g]
+        F -->|Carbs| H[Carbs g]
+        F -->|Fats| I[Fats g]
+    end
+    
+    subgraph "Meal Logging"
+        J[Food Search] --> K[500+ Indian Foods]
+        K --> L[Select Food]
+        L --> M[Portion Size]
+        M --> N[Log Meal]
+        N --> O[Update Daily Total]
+    end
+    
+    subgraph "Progress Tracking"
+        O --> P[Calorie Remaining]
+        O --> Q[Macro Breakdown]
+        P --> R[Dashboard Display]
+        Q --> R
+    end
+```
+
+### Component Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Root Layout"
+        A[layout.tsx] --> B[Providers]
+        B --> C[Theme Provider]
+        B --> D[Context Provider]
+    end
+    
+    subgraph "Pages"
+        E[landing/page.tsx]
+        F[onboarding/page.tsx]
+        G[dashboard/page.tsx]
+        H[tracker/page.tsx]
+        I[history/page.tsx]
+        J[generating/page.tsx]
+    end
+    
+    subgraph "Shared Components"
+        K[Button]
+        L[Card]
+        M[Input]
+        N[Label]
+        O[Badge]
+        P[Progress]
+    end
+    
+    subgraph "Services"
+        Q[gemini.ts]
+        R[mockAi.ts]
+        S[aiPlan.ts]
+        T[nutritionApi.ts]
+    end
+    
+    subgraph "Utilities"
+        U[nutrition.ts]
+        V[validation.ts]
+        W[utils.ts]
+        X[constants.ts]
+    end
+    
+    A --> E
+    A --> F
+    A --> G
+    A --> H
+    A --> I
+    A --> J
+    
+    E --> K
+    F --> K
+    G --> K
+    H --> K
+    
+    Q --> R
+    R --> S
+    S --> T
+    
+    U --> V
+    V --> W
+    W --> X
 ```
 
 ---
@@ -374,12 +538,14 @@ The project uses **custom Tailwind configuration** with:
 ## 🧮 Nutritional Science Logic
 
 ### 🔬 BMR Calculation (Mifflin-St Jeor Equation)
+
 ```
 For Males:   BMR = 10 × weight(kg) + 6.25 × height(cm) - 5 × age + 5
 For Females: BMR = 10 × weight(kg) + 6.25 × height(cm) - 5 × age - 161
 ```
 
 ### 📈 TDEE Calculation
+
 ```
 TDEE = BMR × Activity Multiplier
 - Sedentary: 1.2
@@ -390,6 +556,7 @@ TDEE = BMR × Activity Multiplier
 ```
 
 ### 🎯 Calorie Targets
+
 ```
 Weight Loss:    TDEE - 500 kcal
 Maintenance:    TDEE + 0 kcal
@@ -397,6 +564,7 @@ Weight Gain:    TDEE + 300 kcal
 ```
 
 ### 🥗 Macro Ratios
+
 ```
 Weight Loss:    Protein 35% | Carbs 35% | Fats 30%
 Maintenance:    Protein 30% | Carbs 40% | Fats 30%
