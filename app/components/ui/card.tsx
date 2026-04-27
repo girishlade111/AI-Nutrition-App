@@ -1,50 +1,110 @@
-import React from "react";
+"use client";
+
 import { cn } from "@/app/lib/utils";
+import { motion } from "framer-motion";
+import { ReactNode } from "react";
 
-export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-        <div
-            ref={ref}
-            className={cn("rounded-xl border bg-white text-card-foreground shadow-sm", className)}
-            {...props}
-        />
-    )
-);
-Card.displayName = "Card";
+interface CardProps {
+    children: ReactNode;
+    className?: string;
+    hover?: boolean;
+    onClick?: () => void;
+}
 
-export const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-        <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
-    )
-);
-CardHeader.displayName = "CardHeader";
+export function Card({ children, className, hover = true, onClick }: CardProps) {
+    const Component = onClick ? motion.button : motion.div;
 
-export const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-    ({ className, children, ...props }, ref) => (
-        <h3 ref={ref} className={cn("font-semibold leading-none tracking-tight", className)} {...props}>
+    return (
+        <Component
+            onClick={onClick}
+            whileHover={hover ? { y: -2, transition: { duration: 0.2 } } : undefined}
+            className={cn(
+                "bg-white rounded-xl border border-slate-100/80 shadow-card",
+                "transition-shadow duration-300",
+                hover && "hover:shadow-card-hover",
+                onClick && "cursor-pointer text-left",
+                className
+            )}
+        >
             {children}
-        </h3>
-    )
-);
-CardTitle.displayName = "CardTitle";
+        </Component>
+    );
+}
 
-export const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-    ({ className, children, ...props }, ref) => (
-        <p ref={ref} className={cn("text-sm text-gray-600", className)} {...props}>
-            {children}
-        </p>
-    )
-);
-CardDescription.displayName = "CardDescription";
+export function CardHeader({ children, className }: { children: ReactNode; className?: string }) {
+    return <div className={cn("px-5 py-4 border-b border-slate-50", className)}>{children}</div>;
+}
 
-export const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-);
-CardContent.displayName = "CardContent";
+export function CardTitle({ children, className }: { children: ReactNode; className?: string }) {
+    return <h3 className={cn("text-base font-semibold text-slate-900", className)}>{children}</h3>;
+}
 
-export const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-        <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
-    )
-);
-CardFooter.displayName = "CardFooter";
+export function CardDescription({ children, className }: { children: ReactNode; className?: string }) {
+    return <p className={cn("text-sm text-slate-500 mt-0.5", className)}>{children}</p>;
+}
+
+export function CardContent({ children, className }: { children: ReactNode; className?: string }) {
+    return <div className={cn("px-5 py-4", className)}>{children}</div>;
+}
+
+export function CardFooter({ children, className }: { children: ReactNode; className?: string }) {
+    return <div className={cn("px-5 py-4 border-t border-slate-50 flex items-center gap-3", className)}>{children}</div>;
+}
+
+// Stat card for dashboard metrics
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    unit?: string;
+    icon?: ReactNode;
+    trend?: {
+        value: number;
+        positive: boolean;
+    };
+    color?: "default" | "success" | "warning" | "info";
+    className?: string;
+}
+
+export function StatCard({ title, value, unit, icon, trend, color = "default", className }: StatCardProps) {
+    const colorStyles = {
+        default: "bg-slate-50 text-slate-700",
+        success: "bg-emerald-50 text-emerald-700",
+        warning: "bg-amber-50 text-amber-700",
+        info: "bg-sky-50 text-sky-700",
+    };
+
+    return (
+        <Card className={cn("overflow-hidden", className)}>
+            <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-slate-500">{title}</p>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-bold text-slate-900">{value}</span>
+                            {unit && <span className="text-sm text-slate-500">{unit}</span>}
+                        </div>
+                        {trend && (
+                            <div className="flex items-center gap-1">
+                                <span
+                                    className={cn(
+                                        "text-xs font-medium",
+                                        trend.positive ? "text-emerald-600" : "text-red-600"
+                                    )}
+                                >
+                                    {trend.positive ? "+" : "-"}
+                                    {trend.value}%
+                                </span>
+                                <span className="text-xs text-slate-400">vs last week</span>
+                            </div>
+                        )}
+                    </div>
+                    {icon && (
+                        <div className={cn("p-2.5 rounded-lg", colorStyles[color])}>
+                            {icon}
+                        </div>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
