@@ -1,12 +1,12 @@
 "use client";
 
-import { Github, Twitter, Linkedin, Globe } from "lucide-react";
+import { Globe, ExternalLink, Mail, Heart } from "lucide-react";
 
 const socialLinks = [
-  { href: "https://github.com/girishlade111", icon: Github, label: "GitHub" },
-  { href: "https://twitter.com/girish_lade_", icon: Twitter, label: "Twitter" },
-  { href: "https://linkedin.com/in/girishlade", icon: Linkedin, label: "LinkedIn" },
-  { href: "https://ladestack.in", icon: Globe, label: "Website" },
+  { href: "https://github.com/girishlade111", icon: Globe, label: "GitHub" },
+  { href: "https://twitter.com/girish_lade_", icon: ExternalLink, label: "Twitter" },
+  { href: "https://linkedin.com/in/girishlade", icon: Mail, label: "LinkedIn" },
+  { href: "https://ladestack.in", icon: Heart, label: "Website" },
 ];
 
 export default function SocialIcons() {
